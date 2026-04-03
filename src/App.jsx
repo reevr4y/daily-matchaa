@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Header         from './components/Header';
 import FilterBar      from './components/FilterBar';
 import TaskSection    from './components/TaskSection';
@@ -35,7 +35,7 @@ export default function App() {
   const [filter, setFilter] = useState('daily');
 
   // ── Game state ────────────────────────────────────────────────────────────
-  const { exp, streak, levelInfo, addExp, streakBroke, setExp } = useGameState();
+  const { exp, streak, levelInfo, addExp, streakBroke, setExp, setStreak } = useGameState();
 
   // ── Data state ────────────────────────────────────────────────────────────
   const [tasks,    setTasks]    = useState([]);
@@ -57,6 +57,9 @@ export default function App() {
     fetchGameState,
     updateGameState,
   } = useSheetsAPI();
+
+  const isSyncingRef = useRef(false);
+  const syncTimeoutRef = useRef(null);
 
   // ── Toasts ────────────────────────────────────────────────────────────────
   const { toasts, addToast } = useToast();
@@ -87,16 +90,20 @@ export default function App() {
         if (remoteState) {
           const localStored = localStorage.getItem('dlt_exp');
           const localExp    = localStored ? Number(JSON.parse(localStored)) : 0;
-          const remoteExp   = Number(remoteState.exp || 0);
           const remoteStreak = Number(remoteState.streak || 0);
 
-          // Update ONLY if remote is significantly newer (e.g. at least 5 EXP diff)
-          // and we haven't just updated local state.
           if (remoteExp > localExp + 5) {
+            isSyncingRef.current = true;
             localStorage.setItem('dlt_exp',        JSON.stringify(remoteExp));
             localStorage.setItem('dlt_streak',     JSON.stringify(remoteStreak));
             localStorage.setItem('dlt_lastActive', JSON.stringify(remoteState.last_active || ''));
-            window.location.reload(); 
+            
+            // Update state directly
+            setExp(remoteExp);
+            setStreak(remoteStreak);
+            
+            // Release flag after a small delay
+            setTimeout(() => { isSyncingRef.current = false; }, 1000);
           }
         }
       } catch (err) {
@@ -132,12 +139,22 @@ export default function App() {
     })();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Sync Game State ke Cloud saat EXP berubah ─────────────────────────────
+  // ── Sync Game State ke Cloud saat EXP berubah (Debounced) ─────────────────
   useEffect(() => {
-    if (ready && exp > 0) {
-      updateGameState({ exp, streak, last_active: localStorage.getItem('dlt_lastActive')?.replace(/"/g, '') || '' });
+    if (ready && exp > 0 && !isSyncingRef.current) {
+      if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+      
+      syncTimeoutRef.current = setTimeout(() => {
+        updateGameState({ 
+          exp, 
+          streak, 
+          last_active: localStorage.getItem('dlt_lastActive')?.replace(/"/g, '') || '' 
+        });
+      }, 2000); // 2 second debounce
     }
-  }, [exp, streak, ready]); // eslint-disable-line react-hooks/exhaustive-deps
+    
+    return () => { if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current); };
+  }, [exp, streak, ready, updateGameState]); 
 
   // ── EXP Correction (Auto-reset ONLY if truly corrupted/impossible) ────────
   useEffect(() => {

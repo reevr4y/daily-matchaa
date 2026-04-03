@@ -311,10 +311,10 @@ export function useSheetsAPI() {
       const remote = await sheetsRead('gameState');
       if (Array.isArray(remote) && remote.length > 0) {
         // Cari yang paling baru di-update
-        const latest = [...remote].sort((a, b) => 
-          new Date(b.updated_at) - new Date(a.updated_at)
-        )[0];
-        return latest;
+        const latest = [...remote]
+          .filter(r => r.updated_at && !isNaN(new Date(r.updated_at).getTime()))
+          .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())[0];
+        return latest || remote[remote.length - 1]; // Fallback to last row if sort fails
       }
     } catch (e) {
       console.warn('[Sheets] fetchGameState failed:', e);
