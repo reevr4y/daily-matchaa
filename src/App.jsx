@@ -90,6 +90,7 @@ export default function App() {
         if (remoteState) {
           const localStored = localStorage.getItem('dlt_exp');
           const localExp    = localStored ? Number(JSON.parse(localStored)) : 0;
+          const remoteExp   = Number(remoteState.exp || 0);
           const remoteStreak = Number(remoteState.streak || 0);
 
           if (remoteExp > localExp + 5) {
@@ -155,6 +156,15 @@ export default function App() {
     
     return () => { if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current); };
   }, [exp, streak, ready, updateGameState]); 
+
+  // ── ONE-TIME RESET to 150 (USER REQUEST) ──────────────────────────────────
+  useEffect(() => {
+    if (ready && exp > 5000) { 
+      setExp(150);
+      updateGameState({ exp: 150, streak, last_active: localStorage.getItem('dlt_lastActive')?.replace(/"/g, '') || '' });
+      addToast('EXP sudah aku reset ke 150 sesuai permintaanmu ya! ✨', 'success');
+    }
+  }, [ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── EXP Correction (Auto-reset ONLY if truly corrupted/impossible) ────────
   useEffect(() => {
