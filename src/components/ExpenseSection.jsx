@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { filterByPeriod, getTotalSpending, formatCurrency } from '../utils/insights';
 import { playPop } from '../utils/sounds';
 
@@ -6,9 +6,61 @@ export default function ExpenseSection({ expenses, filter, onAdd, onDelete, onTo
   const [name, setName]     = useState('');
   const [amount, setAmount] = useState('');
   const [removingId, setRemovingId] = useState(null);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const suggestionsRef = useRef(null);
 
   const filtered = filterByPeriod(expenses, filter);
   const total    = getTotalSpending(filtered);
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(e.target)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Calculate unique suggestions with frequency count
+  const suggestionsData = useMemo(() => {
+    if (!expenses || expenses.length === 0) return [];
+    
+    const freq = {};
+    const canonicalNames = {};
+
+    expenses.forEach(e => {
+      const n = e.name?.trim();
+      if (!n) return;
+      const lower = n.toLowerCase();
+      freq[lower] = (freq[lower] || 0) + 1;
+      
+      if (!canonicalNames[lower] || (freq[lower] > (freq[canonicalNames[lower].toLowerCase()] || 0))) {
+        canonicalNames[lower] = n;
+      }
+    });
+
+    return Object.keys(freq)
+      .sort((a, b) => freq[b] - freq[a])
+      .map(lower => ({
+        name: canonicalNames[lower],
+        count: freq[lower]
+      }));
+  }, [expenses]);
+
+  const filteredSuggestions = useMemo(() => {
+    const search = name.trim().toLowerCase();
+    if (!search) return suggestionsData.slice(0, 6);
+    return suggestionsData
+      .filter(s => s.name.toLowerCase().includes(search))
+      .slice(0, 6);
+  }, [suggestionsData, name]);
+
+  const handleSelectSuggestion = (suggestedName) => {
+    setName(suggestedName);
+    setShowSuggestions(false);
+  };
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -48,13 +100,38 @@ export default function ExpenseSection({ expenses, filter, onAdd, onDelete, onTo
 
       {/* Add form */}
       <form onSubmit={handleAdd} className="space-y-2 mb-4">
-        <input
-          type="text"
-          value={name}
-          onChange={e => setName(e.target.value)}
-          placeholder="Nama pengeluaran..."
-          className="input-field"
-        />
+        <div className="suggestions-container" ref={suggestionsRef}>
+          <input
+            type="text"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            onFocus={() => setShowSuggestions(true)}
+            onClick={() => setShowSuggestions(true)}
+            placeholder="Nama pengeluaran..."
+            className="input-field"
+            autoComplete="off"
+          />
+          
+          {showSuggestions && filteredSuggestions.length > 0 && (
+            <div className="suggestions-menu">
+              {filteredSuggestions.map((s, i) => (
+                <div 
+                  key={i} 
+                  className="suggestion-item"
+                  onClick={() => handleSelectSuggestion(s.name)}
+                >
+                  <div className="item-content">
+                    <span className="item-icon">🛍️</span>
+                    <span className="item-name">{s.name}</span>
+                  </div>
+                  {s.count > 1 && (
+                    <span className="item-freq">{s.count}x</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
         <div className="flex gap-2">
           <input
             type="number"
