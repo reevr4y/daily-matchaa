@@ -182,12 +182,26 @@ export default function App() {
   if (!ready) {
     return (
       <div
-        className="min-h-screen flex items-center justify-center"
+        className="min-h-screen"
         style={{ background: 'var(--bg)' }}
       >
-        <div className="text-center animate-pulse-soft">
-          <div className="text-4xl mb-3">🌿</div>
-          <p className="text-sm" style={{ color: 'var(--muted)' }}>Loading...</p>
+        <div className="max-w-2xl mx-auto px-4 py-6 lg:max-w-4xl space-y-4">
+          {/* Skeleton header */}
+          <div className="skeleton-card">
+            <div className="skeleton-line" style={{ width: '55%' }} />
+            <div className="skeleton-line" style={{ width: '35%', height: '10px', animationDelay: '0.1s' }} />
+            <div className="skeleton" style={{ height: '10px', width: '100%', borderRadius: '99px', animationDelay: '0.2s' }} />
+          </div>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            {[0,1,2,3].map(i => (
+              <div key={i} className="skeleton-card" style={{ animationDelay: `${i * 0.08}s` }}>
+                <div className="skeleton-line" style={{ width: '40%', animationDelay: `${i * 0.1}s` }} />
+                <div className="skeleton-line" style={{ animationDelay: `${i * 0.12}s` }} />
+                <div className="skeleton-line" style={{ width: '75%', animationDelay: `${i * 0.14}s` }} />
+                <div className="skeleton-line" style={{ width: '60%', animationDelay: `${i * 0.16}s` }} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );

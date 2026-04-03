@@ -24,7 +24,7 @@ export default function Header({ levelInfo, exp, streak, darkMode, onToggleDark 
           {/* Streak badge */}
           {streak > 0 && (
             <div className="streak-badge">
-              🔥 {streak}d
+              <span className="streak-fire">🔥</span> {streak}d
             </div>
           )}
 

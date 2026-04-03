@@ -14,9 +14,13 @@
   --muted:      #8A8A8A;
   --border:     #EDE8E0;
   --shadow:     rgba(0, 0, 0, 0.06);
+  --shadow-md:  rgba(0, 0, 0, 0.10);
   --success:    #7BAE7F;
   --danger:     #D98080;
   --exp-fill:   #C4A882;
+  --glass:      rgba(255, 255, 255, 0.65);
+  --glow-green: rgba(123, 174, 127, 0.25);
+  --glow-gold:  rgba(196, 168, 130, 0.3);
 }
 
 .dark {
@@ -28,9 +32,13 @@
   --muted:      #8A8075;
   --border:     #353028;
   --shadow:     rgba(0, 0, 0, 0.3);
+  --shadow-md:  rgba(0, 0, 0, 0.45);
   --success:    #6FA874;
   --danger:     #D08080;
   --exp-fill:   #A88B64;
+  --glass:      rgba(37, 35, 32, 0.75);
+  --glow-green: rgba(111, 168, 116, 0.2);
+  --glow-gold:  rgba(168, 139, 100, 0.25);
 }
 
 /* ─── Base ─── */
@@ -42,6 +50,10 @@ body {
   margin: 0;
   font-family: 'Inter', system-ui, sans-serif;
   background-color: var(--bg);
+  /* Subtle gradient background */
+  background-image: radial-gradient(ellipse at 20% 10%, rgba(214,194,161,0.18) 0%, transparent 55%),
+                    radial-gradient(ellipse at 80% 90%, rgba(123,174,127,0.10) 0%, transparent 50%);
+  background-attachment: fixed;
   color: var(--text);
   transition: background-color 0.3s ease, color 0.3s ease;
   -webkit-font-smoothing: antialiased;
@@ -52,13 +64,15 @@ body {
 .card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 1.25rem;
-  box-shadow: 0 2px 20px var(--shadow);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  border-radius: 1.375rem;
+  box-shadow: 0 2px 16px var(--shadow), 0 1px 4px rgba(0,0,0,0.04);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  animation: cardEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .card:hover {
-  box-shadow: 0 4px 32px var(--shadow);
+  box-shadow: 0 8px 32px var(--shadow-md), 0 2px 8px rgba(0,0,0,0.06);
+  transform: translateY(-3px);
 }
 
 /* ─── EXP Bar ─── */
@@ -67,13 +81,22 @@ body {
   border-radius: 99px;
   height: 10px;
   overflow: hidden;
+  position: relative;
 }
 
 .exp-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--exp-fill), #A88B64);
+  background: linear-gradient(90deg, var(--exp-fill), #A88B64, #D4B896);
+  background-size: 200% 100%;
   border-radius: 99px;
-  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: barShimmer 2.5s ease-in-out infinite;
+  box-shadow: 0 0 8px var(--glow-gold);
+}
+
+@keyframes barShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 /* ─── Task item ─── */
@@ -85,18 +108,23 @@ body {
   border-radius: 0.875rem;
   background: var(--bg);
   border: 1px solid var(--border);
-  transition: all 0.2s ease;
-  animation: slideUp 0.3s ease-out;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-.task-item:hover { background: var(--accent); }
+.task-item:hover {
+  background: var(--accent);
+  transform: translateX(3px);
+  border-color: var(--accent-2);
+  box-shadow: 0 2px 12px var(--shadow);
+}
 
 .task-item.completed {
-  opacity: 0.55;
+  opacity: 0.5;
 }
 
 .task-item.entering {
-  animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .task-item.removing {
@@ -105,8 +133,8 @@ body {
 
 /* ─── Custom checkbox ─── */
 .custom-checkbox {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   border: 2px solid var(--accent-2);
   background: var(--card);
@@ -115,18 +143,28 @@ body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
 }
 
 .custom-checkbox:hover {
-  border-color: var(--exp-fill);
-  transform: scale(1.1);
+  border-color: var(--success);
+  transform: scale(1.15);
+  box-shadow: 0 0 0 4px var(--glow-green);
 }
 
 .custom-checkbox.checked {
   background: var(--success);
   border-color: var(--success);
-  animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: checkPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 0 0 4px var(--glow-green);
+}
+
+@keyframes checkPop {
+  0%   { transform: scale(0.8) rotate(-10deg); }
+  40%  { transform: scale(1.35) rotate(5deg); }
+  70%  { transform: scale(0.9); }
+  100% { transform: scale(1); }
 }
 
 /* ─── Strike-through animation ─── */
@@ -152,51 +190,68 @@ body {
 /* ─── Input ─── */
 .input-field {
   width: 100%;
-  padding: 0.625rem 0.875rem;
-  border-radius: 0.75rem;
+  padding: 0.7rem 1rem;
+  border-radius: 0.875rem;
   border: 1.5px solid var(--border);
   background: var(--bg);
   color: var(--text);
   font-family: 'Inter', sans-serif;
   font-size: 0.9rem;
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
 }
 
 .input-field:focus {
-  border-color: var(--accent-2);
-  box-shadow: 0 0 0 3px rgba(214, 194, 161, 0.25);
+  border-color: var(--success);
+  box-shadow: 0 0 0 4px var(--glow-green);
+  transform: translateY(-1px);
 }
 
 .input-field::placeholder { color: var(--muted); }
 
 /* ─── Button ─── */
 .btn-primary {
-  padding: 0.625rem 1.25rem;
-  background: var(--accent-2);
+  padding: 0.65rem 1.25rem;
+  background: linear-gradient(135deg, var(--accent-2), var(--accent));
   color: #3E3E3E;
   border: none;
-  border-radius: 0.75rem;
+  border-radius: 0.875rem;
   font-family: 'Inter', sans-serif;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0);
+  transition: background 0.15s ease;
+  border-radius: inherit;
 }
 
 .dark .btn-primary {
   color: var(--text);
-  background: var(--accent-2);
 }
 
 .btn-primary:hover {
-  background: var(--accent);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  transform: scale(1.05) translateY(-1px);
+  box-shadow: 0 6px 20px var(--shadow-md);
 }
 
-.btn-primary:active { transform: translateY(0); }
+.btn-primary:hover::after {
+  background: rgba(255,255,255,0.08);
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease;
+}
 
 /* ─── Filter pill ─── */
 .filter-pill {
@@ -223,8 +278,8 @@ body {
 /* ─── Toast ─── */
 .toast-container {
   position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
+  top: 1rem;
+  right: 1rem;
   z-index: 9999;
   display: flex;
   flex-direction: column;
@@ -235,19 +290,31 @@ body {
 .toast {
   padding: 0.75rem 1.1rem;
   border-radius: 0.875rem;
-  background: var(--card);
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border);
-  box-shadow: 0 4px 24px var(--shadow);
+  box-shadow: 0 8px 32px var(--shadow-md);
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--text);
-  animation: slideInRight 0.35s ease-out;
+  animation: toastIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   pointer-events: auto;
-  max-width: 280px;
+  max-width: 300px;
 }
 
 .toast.dismissing {
-  animation: slideOutRight 0.3s ease-in forwards;
+  animation: toastOut 0.3s ease-in forwards;
+}
+
+@keyframes toastIn {
+  0% { opacity: 0; transform: translateX(100%) scale(0.8); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes toastOut {
+  0% { opacity: 1; transform: translateX(0) scale(1); }
+  100% { opacity: 0; transform: translateX(80%) scale(0.8); }
 }
 
 /* ─── Streak fire ─── */
@@ -261,7 +328,21 @@ body {
   font-weight: 700;
   font-size: 0.8rem;
   color: #8B4800;
-  animation: pulseSoft 2s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.streak-badge .streak-fire {
+  display: inline-block;
+  animation: flickerFire 1.8s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+@keyframes flickerFire {
+  0%, 100% { transform: scale(1) rotate(-3deg); filter: brightness(1); }
+  25%       { transform: scale(1.15) rotate(2deg); filter: brightness(1.2); }
+  50%       { transform: scale(0.95) rotate(-2deg); filter: brightness(0.9); }
+  75%       { transform: scale(1.1) rotate(3deg); filter: brightness(1.15); }
 }
 
 /* ─── Level badge ─── */
@@ -294,9 +375,15 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.6rem 0;
+  padding: 0.65rem 0;
   border-bottom: 1px solid var(--border);
   font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.insight-row:hover {
+  padding-left: 4px;
+  color: var(--text);
 }
 
 .insight-row:last-child { border-bottom: none; }
@@ -600,9 +687,9 @@ body {
 /* ─── Responsive ─── */
 @media (max-width: 640px) {
   .toast-container {
-    bottom: 1rem;
-    right: 1rem;
-    left: 1rem;
+    top: 0.75rem;
+    right: 0.75rem;
+    left: 0.75rem;
   }
   .toast { max-width: 100%; }
 
@@ -615,6 +702,26 @@ body {
   .exp-popup-card { padding: 1.5rem 1.25rem; }
   .exp-popup-icon { font-size: 2.5rem; }
   .exp-popup-title { font-size: 1.8rem; }
+
+  /* Mobile: larger touch targets */
+  .btn-primary {
+    min-height: 46px;
+    font-size: 0.95rem;
+  }
+  .custom-checkbox {
+    width: 28px;
+    height: 28px;
+  }
+  .task-item {
+    padding: 0.875rem 1rem;
+  }
+  .card {
+    border-radius: 1.125rem;
+  }
+  /* Extra bottom padding for mobile nav bar overlap */
+  .max-w-2xl {
+    padding-bottom: 2rem !important;
+  }
 }
 
 /* ─── EXP Popup ─── */
@@ -842,6 +949,70 @@ body {
   0% { opacity: 0; transform: translateY(8px); }
   100% { opacity: 1; transform: translateY(0); }
 }
+
+/* ─── Card enter animation ─── */
+@keyframes cardEnter {
+  0%   { opacity: 0; transform: translateY(16px) scale(0.97); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ─── Skeleton loading ─── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--accent) 25%,
+    var(--border) 50%,
+    var(--accent) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+.skeleton-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1.375rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  animation: cardEnter 0.4s ease both;
+}
+
+.skeleton-line {
+  height: 14px;
+  border-radius: 99px;
+  background: linear-gradient(
+    90deg,
+    var(--accent) 25%,
+    var(--border) 50%,
+    var(--accent) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ─── Stagger bar animation for chart ─── */
+.chart-bar-enter {
+  animation: barGrow 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transform-origin: bottom;
+}
+
+@keyframes barGrow {
+  0%   { transform: scaleY(0); opacity: 0; }
+  60%  { opacity: 1; }
+  100% { transform: scaleY(1); }
+}
+
+/* ─── Stagger delay helpers ─── */
+.delay-0  { animation-delay: 0ms !important; }
+.delay-50 { animation-delay: 50ms !important; }
 
 .dark .exp-popup-level-title {
   color: #FFD700;
@@ -1208,7 +1379,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.4rem 0.9rem;
+  padding: 0.45rem 1rem;
   border-radius: 99px;
   border: 1.5px solid var(--accent-2);
   background: var(--accent);
@@ -1217,13 +1388,17 @@ body {
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   white-space: nowrap;
+  min-height: 38px; /* thumb-friendly */
 }
 .history-btn:hover {
   background: var(--accent-2);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: scale(1.05) translateY(-1px);
+  box-shadow: 0 4px 16px var(--shadow-md);
+}
+.history-btn:active {
+  transform: scale(0.95);
 }
 
 /* ─── Responsive for history modal ─── */
