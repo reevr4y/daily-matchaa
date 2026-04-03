@@ -327,12 +327,16 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
           {preview && (
             <div
               className="relative mb-3 rounded-2xl overflow-hidden"
-              style={{ border: '2px solid var(--accent)', aspectRatio: '1 / 1' }}
+              style={{ 
+                border: '2px solid var(--accent)', 
+                aspectRatio: '1 / 1',
+                background: 'rgba(0,0,0,0.03)' 
+              }}
             >
               <img
                 src={preview}
                 alt="preview"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
               <button
                 onClick={handleCancel}
@@ -442,8 +446,8 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
                 style={{
                   width:      '100%',
                   height:     '100%',
-                  objectFit:  'cover',
-                  objectPosition: 'center',
+                  objectFit:  'contain',
+                  background: 'rgba(0,0,0,0.03)',
                   display:    'block',
                 }}
                 onError={(e) => { e.target.style.display = 'none'; }}
@@ -457,11 +461,17 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
             >
               {rePreview ? (
                 // Preview foto yang dipilih untuk re-upload
-                <div className="relative" style={{ aspectRatio: '1 / 1' }}>
+                <div 
+                  className="relative" 
+                  style={{ 
+                    aspectRatio: '1 / 1', 
+                    background: 'rgba(0,0,0,0.03)' 
+                  }}
+                >
                   <img
                     src={rePreview}
                     alt="preview re-upload"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                   <button
                     onClick={cancelReUpload}
