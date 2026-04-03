@@ -1433,6 +1433,50 @@ body {
   z-index: 1;
 }
 
+/* ─── Header row: 3/4 header + 1/4 date card ─── */
+.header-row {
+  display: flex;
+  gap: 1.25rem;
+  align-items: stretch;
+  margin-bottom: 1.5rem;
+}
+
+.header-main {
+  flex: 3;
+  min-width: 0;
+}
+
+/* Remove the default mb on Header card since header-row handles spacing */
+.header-main .card {
+  margin-bottom: 0;
+  height: 100%;
+}
+
+.header-date-card {
+  flex: 1;
+  min-width: 120px;
+  max-width: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+/* On mobile, stack vertically */
+@media (max-width: 640px) {
+  .header-row {
+    flex-direction: column;
+  }
+  .header-date-card {
+    max-width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    gap: 1rem;
+  }
+}
+
 /* ─── Action bar ─── */
 .action-bar {
   display: flex;

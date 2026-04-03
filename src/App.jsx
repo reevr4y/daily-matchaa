@@ -220,14 +220,31 @@ export default function App() {
       {/* ── Container ── */}
       <div className="app-container">
 
-        {/* ── Header ── */}
-        <Header
-          levelInfo={levelInfo}
-          exp={exp}
-          streak={streak}
-          darkMode={darkMode}
-          onToggleDark={() => setDarkMode(d => !d)}
-        />
+        {/* ── Header Row: 3/4 header + 1/4 date card ── */}
+        <div className="header-row">
+          <div className="header-main">
+            <Header
+              levelInfo={levelInfo}
+              exp={exp}
+              streak={streak}
+              darkMode={darkMode}
+              onToggleDark={() => setDarkMode(d => !d)}
+            />
+          </div>
+          <div className="header-date-card card p-5">
+            <p className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--muted)' }}>
+              {new Date().toLocaleDateString('id-ID', { weekday: 'long' })}
+            </p>
+            <p className="text-3xl font-bold leading-none" style={{ color: 'var(--text)', letterSpacing: '-0.03em' }}>
+              {new Date().getDate()}
+            </p>
+            <p className="text-xs font-medium mt-0.5" style={{ color: 'var(--muted)' }}>
+              {new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
+            </p>
+            <div className="mt-3 h-px" style={{ background: 'var(--border)' }} />
+            <p className="text-xs font-semibold mt-3 text-center" style={{ color: 'var(--success)' }}>✨ Semangat!</p>
+          </div>
+        </div>
 
         {/* ── Action Bar ── */}
         <div className="action-bar">
