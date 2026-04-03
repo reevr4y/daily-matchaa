@@ -58,7 +58,8 @@ const DONE_MESSAGES = [
 ];
 
 function getTodayKey() {
-  return new Date().toISOString().slice(0, 10);
+  // Gunakan local time format YYYY-MM-DD (WIB/GMT+7) agar sinkron dengan API
+  return new Date().toLocaleDateString('en-CA');
 }
 
 function loadPapState() {
@@ -232,6 +233,17 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
     if (reUploadRef.current) reUploadRef.current.value = '';
   };
 
+  const handleReset = () => {
+    if (window.confirm('Hapus status Pap hari ini dari HP ini saja? (Bisa sinkron ulang lho!)')) {
+      localStorage.removeItem(STORAGE_KEY);
+      setPapState(null);
+      setPreview(null);
+      onToast('Status Pap di-reset! Silakan upload baru atau tunggu sinkron otomatis 🔄', 'info');
+      // Beri jeda kecil lalu paksa cek ulang sync
+      setTimeout(() => window.location.reload(), 800);
+    }
+  };
+
   // Shake animation kalau klik tombol upload
   const triggerShake = () => {
     setShaking(true);
@@ -387,6 +399,15 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
             <p className="text-xs mt-1" style={{ color: 'var(--muted)' }}>
               {doneMsg.sub}
             </p>
+            
+            {/* Tombol kecil Reset/Ulangi */}
+            <button
+              onClick={handleReset}
+              className="mt-3 text-[10px] uppercase tracking-wider font-bold opacity-40 hover:opacity-100 transition-opacity"
+              style={{ color: 'var(--muted)' }}
+            >
+              🔄 Ulangi / Reset Pap Hari Ini
+            </button>
           </div>
 
           {/* Tampilkan foto dari Drive URL (cross-device!) */}
