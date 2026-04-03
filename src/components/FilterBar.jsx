@@ -6,7 +6,7 @@ const FILTERS = [
 
 export default function FilterBar({ active, onChange }) {
   return (
-    <div className="flex items-center gap-2 mb-4">
+    <div className="flex items-center gap-2 flex-1">
       {FILTERS.map(f => (
         <button
           key={f.key}

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { playChime } from '../utils/sounds';
 import { fireConfetti } from '../utils/confetti';
 
@@ -70,15 +70,37 @@ function loadPapState() {
 }
 
 function savePapState(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ date: getTodayKey(), ...data }));
+  // Jangan simpan base64 — terlalu besar dan tidak bisa cross-device
+  // Simpan hanya Drive URL (photo_url) atau flag done saja
+  const { preview: _drop, ...safeData } = data; // buang field preview
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ date: getTodayKey(), ...safeData }));
 }
 
 export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak, streak, onShowExpPopup }) {
   const [papState, setPapState] = useState(() => loadPapState());
-  const [preview, setPreview]   = useState(papState?.preview || null);
-  const [loading, setLoading]   = useState(false);
-  const [shaking, setShaking]   = useState(false);
-  const fileRef = useRef(null);
+  // preview = base64 DataURL sementara (untuk ditampilkan sebelum submit)
+  // setelah submit, kita pakai photo_url (Drive URL) dari papState
+  const [preview, setPreview]     = useState(null); // TIDAK load dari LS (base64 tidak disimpan)
+  const [uploading, setUploading]   = useState(false);
+  const [reUploading, setReUploading] = useState(false);
+  const [rePreview, setRePreview]   = useState(null); // preview untuk re-upload
+  const [loading, setLoading]     = useState(false);
+  const [shaking, setShaking]     = useState(false);
+  const fileRef     = useRef(null);
+  const reUploadRef = useRef(null); // file input khusus re-upload
+
+  // Drive URL yang tersimpan di LS (untuk cross-device)
+  const savedPhotoUrl = papState?.photo_url || null;
+
+  // ── Listen cross-device sync event dari App.jsx ───────────────────────────
+  useEffect(() => {
+    const onSync = () => {
+      const synced = loadPapState();
+      if (synced) setPapState(synced);
+    };
+    window.addEventListener('pap-synced', onSync);
+    return () => window.removeEventListener('pap-synced', onSync);
+  }, []);
 
   // Pick deterministic idle message for today
   const dayIndex = new Date().getDate() % IDLE_MESSAGES.length;
@@ -102,23 +124,43 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
   const handleSubmit = async () => {
     if (!preview || isDone) return;
 
-    const state = { done: true, preview, timestamp: new Date().toISOString() };
+    setUploading(true);
+    onToast('Upload foto ke Drive...⏳', 'info');
+
+    const timestamp = new Date().toISOString();
+    let photo_url = '';
+
+    // ── Upload foto ke Google Drive ──────────────────────────────────────────
+    if (onAddPap) {
+      try {
+        const result = await onAddPap({
+          date:         getTodayKey(),
+          status:       'done',
+          timestamp,
+          photoDataUrl: preview, // kirim base64 ke Drive
+        });
+        photo_url = result?.photo_url || '';
+      } catch (e) {
+        console.warn('[PAP] Upload failed:', e);
+      }
+    }
+
+    // ── Simpan state ke LS (TANPA base64, hanya Drive URL) ──────────────────
+    const state = { done: true, photo_url, timestamp };
     savePapState(state);
     setPapState({ date: getTodayKey(), ...state });
+    setPreview(null); // hapus base64 dari memory
+    setUploading(false);
 
     playChime();
     fireConfetti();
     onExp(15);
     if (onShowExpPopup) onShowExpPopup(15, 'exp');
-    onToast('Pap berhasil! Streak aman! +15 EXP 📸✨', 'success');
-
-    // ── Catat ke Google Sheets ────────────────────────────────────────────────
-    if (onAddPap) {
-      await onAddPap({
-        date:      getTodayKey(),
-        status:    'done',
-        timestamp: state.timestamp,
-      });
+    
+    if (photo_url) {
+      onToast('Pap berhasil! Foto tersimpan di Drive ☁️ +15 EXP 📸✨', 'success');
+    } else {
+      onToast('Pap tercatat! Tapi foto gagal simpan di Drive (cek console) ⚠️ +15 EXP', 'warn');
     }
 
     // ── Catat streak ke Sheets juga ───────────────────────────────────────────
@@ -134,6 +176,60 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
   const handleCancel = () => {
     setPreview(null);
     if (fileRef.current) fileRef.current.value = '';
+  };
+
+  // ── Re-upload foto untuk PAP yang sudah done tapi belum ada Drive URL ──────
+  const handleReUploadChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => setRePreview(ev.target.result);
+    reader.readAsDataURL(file);
+  };
+
+  const handleReUpload = async () => {
+    if (!rePreview || reUploading) return;
+    setReUploading(true);
+    onToast('Re-upload foto ke Drive... ⏳', 'info');
+
+    let photo_url  = '';
+    let papResult  = null;
+    if (onAddPap) {
+      try {
+        papResult = await onAddPap({
+          date:         getTodayKey(),
+          status:       'done',
+          timestamp:    papState?.timestamp || new Date().toISOString(),
+          photoDataUrl: rePreview,
+        });
+        photo_url = papResult?.photo_url || '';
+      } catch (err) {
+        console.warn('[PAP] Re-upload threw:', err);
+      }
+    }
+
+    if (photo_url) {
+      const updated = { ...papState, photo_url };
+      savePapState(updated);
+      setPapState({ date: getTodayKey(), ...updated });
+      setRePreview(null);
+      if (reUploadRef.current) reUploadRef.current.value = '';
+      onToast('Foto berhasil di-upload ke Drive! ☁️📸', 'success');
+    } else {
+      console.error('[PAP] Re-upload papResult:', papResult);
+      onToast(
+        papResult?.error
+          ? `Upload gagal: ${String(papResult.error).slice(0, 60)}`
+          : 'Upload gagal 😭 Buka F12 > Console untuk lihat error detail',
+        'warn'
+      );
+    }
+    setReUploading(false);
+  };
+
+  const cancelReUpload = () => {
+    setRePreview(null);
+    if (reUploadRef.current) reUploadRef.current.value = '';
   };
 
   // Shake animation kalau klik tombol upload
@@ -233,7 +329,7 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
           {!preview ? (
             <button
               onClick={triggerShake}
-              disabled={loading}
+              disabled={loading || uploading}
               className="btn-primary w-full py-3 rounded-2xl flex items-center justify-center gap-2 font-bold"
               style={{ fontSize: '0.95rem' }}
             >
@@ -244,6 +340,7 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
             <div className="flex gap-2">
               <button
                 onClick={handleCancel}
+                disabled={uploading}
                 className="flex-1 py-2.5 rounded-2xl text-sm font-medium border transition-colors"
                 style={{
                   background: 'var(--bg)',
@@ -255,9 +352,10 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
               </button>
               <button
                 onClick={handleSubmit}
+                disabled={uploading}
                 className="flex-1 btn-primary py-2.5 rounded-2xl flex items-center justify-center gap-1.5 font-bold"
               >
-                ✅ Kirim Pap! (+15 EXP)
+                {uploading ? '⏳ Uploading...' : '✅ Kirim Pap! (+15 EXP)'}
               </button>
             </div>
           )}
@@ -291,13 +389,92 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
             </p>
           </div>
 
-          {preview && (
+          {/* Tampilkan foto dari Drive URL (cross-device!) */}
+          {savedPhotoUrl ? (
             <div className="rounded-2xl overflow-hidden mb-3" style={{ border: '2px solid var(--success)' }}>
               <img
-                src={preview}
+                src={savedPhotoUrl}
                 alt="pap hari ini"
                 className="w-full object-cover"
                 style={{ maxHeight: '220px' }}
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
+            </div>
+          ) : (
+            // ── Foto belum ter-upload: tampilkan re-upload UI ──────────────
+            <div
+              className="rounded-2xl mb-3 overflow-hidden"
+              style={{ border: '1.5px dashed var(--success)' }}
+            >
+              {rePreview ? (
+                // Preview foto yang dipilih untuk re-upload
+                <div className="relative">
+                  <img
+                    src={rePreview}
+                    alt="preview re-upload"
+                    className="w-full object-cover"
+                    style={{ maxHeight: '180px' }}
+                  />
+                  <button
+                    onClick={cancelReUpload}
+                    disabled={reUploading}
+                    className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
+                    style={{ background: 'rgba(0,0,0,0.5)', color: '#fff' }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                // Placeholder: belum ada foto
+                <div
+                  className="flex flex-col items-center justify-center gap-1.5 py-4 text-xs"
+                  style={{ color: 'var(--muted)' }}
+                >
+                  <span className="text-2xl">📷</span>
+                  <span className="font-medium">Foto belum ter-upload ke Drive</span>
+                  <span style={{ opacity: 0.7 }}>Upload sekarang biar bisa dilihat di HP lain!</span>
+                </div>
+              )}
+
+              {/* Re-upload action row */}
+              <div className="flex gap-2 p-2">
+                <button
+                  onClick={() => reUploadRef.current?.click()}
+                  disabled={reUploading}
+                  className="flex-1 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1"
+                  style={{
+                    background: 'var(--bg)',
+                    border: '1.5px solid var(--border)',
+                    color: 'var(--text)',
+                    opacity: reUploading ? 0.5 : 1,
+                  }}
+                >
+                  🖼️ {rePreview ? 'Ganti' : 'Pilih Foto'}
+                </button>
+                {rePreview && (
+                  <button
+                    onClick={handleReUpload}
+                    disabled={reUploading}
+                    className="flex-1 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1"
+                    style={{
+                      background: 'var(--success)',
+                      color: '#fff',
+                      opacity: reUploading ? 0.6 : 1,
+                    }}
+                  >
+                    {reUploading ? '⏳ Uploading...' : '☁️ Upload ke Drive'}
+                  </button>
+                )}
+              </div>
+
+              {/* Hidden re-upload input */}
+              <input
+                ref={reUploadRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={handleReUploadChange}
               />
             </div>
           )}
@@ -307,8 +484,8 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
             className="flex items-center justify-center gap-1.5 text-xs font-medium py-2 rounded-xl"
             style={{ background: 'rgba(34,197,94,0.1)', color: 'var(--success)' }}
           >
-            <span>✅</span>
-            <span>Tercatat di Sheets · Reset besok pagi</span>
+            <span>{savedPhotoUrl ? '☁️' : '⚠️'}</span>
+            <span>{savedPhotoUrl ? 'Foto tersimpan di Drive · Bisa dibuka di device lain!' : 'Tercatat di Sheets · Upload foto supaya sync!'}</span>
           </div>
         </>
       )}

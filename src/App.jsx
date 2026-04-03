@@ -5,6 +5,7 @@ import TaskSection    from './components/TaskSection';
 import ExpenseSection from './components/ExpenseSection';
 import InsightCard    from './components/InsightCard';
 import DailyPhotoTask from './components/DailyPhotoTask';
+import HistoryModal   from './components/HistoryModal';
 import FeedbackToast, { useToast } from './components/FeedbackToast';
 import WelcomeCard    from './components/WelcomeCard';
 import ExpPopup, { useExpPopup } from './components/ExpPopup';
@@ -17,6 +18,7 @@ export default function App() {
   // ── Dark mode ────────────────────────────────────────────────────────────
   const [darkMode, setDarkMode] = useLocalStorage('dlt_dark', false);
   const [showWelcome, setShowWelcome] = useState(true);
+  const [showHistory, setShowHistory] = useState(false);
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
   }, [darkMode]);
@@ -41,6 +43,7 @@ export default function App() {
     fetchExpenses,
     addExpense:       apiAddExpense,
     addPapRecord:     apiAddPap,
+    fetchTodayPap,
     saveStreakToSheets,
   } = useSheetsAPI();
 
@@ -65,6 +68,33 @@ export default function App() {
       const [t, e] = await Promise.all([fetchTasks(), fetchExpenses()]);
       setTasks(t || []);
       setExpenses(e || []);
+
+      // ── Cross-device PAP sync ──────────────────────────────────────────────
+      // Kalau buka di device baru, localStorage belum punya PAP hari ini.
+      // Kita fetch dari Sheets dan restore ke LS supaya foto bisa tampil.
+      try {
+        const todayKey = new Date().toISOString().slice(0, 10);
+        const localPap = JSON.parse(localStorage.getItem('dlt_daily_pap') || 'null');
+        const hasTodayLocal = localPap?.date === todayKey && localPap?.done === true;
+
+        if (!hasTodayLocal) {
+          const remotePap = await fetchTodayPap();
+          if (remotePap && remotePap.status === 'done') {
+            // Restore ke LS dengan photo_url dari Drive
+            localStorage.setItem('dlt_daily_pap', JSON.stringify({
+              date:      todayKey,
+              done:      true,
+              photo_url: remotePap.photo_url || '',
+              timestamp: remotePap.timestamp || '',
+            }));
+            // Force re-render DailyPhotoTask dengan dispatch custom event
+            window.dispatchEvent(new Event('pap-synced'));
+          }
+        }
+      } catch (e) {
+        console.warn('[PAP Sync] Failed to sync from Sheets:', e);
+      }
+
       setReady(true);
     })();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -145,8 +175,18 @@ export default function App() {
           onToggleDark={() => setDarkMode(d => !d)}
         />
 
-        {/* ── Filter ── */}
-        <FilterBar active={filter} onChange={setFilter} />
+        {/* ── Filter + history button row ── */}
+        <div className="flex items-center gap-2 mb-4">
+          <FilterBar active={filter} onChange={setFilter} />
+          <button
+            className="history-btn flex-shrink-0"
+            onClick={() => setShowHistory(true)}
+            aria-label="Buka riwayat harian"
+          >
+            <span>📅</span>
+            <span>Riwayat</span>
+          </button>
+        </div>
 
         {/* ── Main Grid ── */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -230,6 +270,15 @@ export default function App() {
 
       {/* ── Welcome Card ── */}
       {showWelcome && <WelcomeCard onDismiss={() => setShowWelcome(false)} />}
+
+      {/* ── History Modal ── */}
+      {showHistory && (
+        <HistoryModal
+          tasks={tasks}
+          expenses={expenses}
+          onClose={() => setShowHistory(false)}
+        />
+      )}
 
       {/* ── EXP Popups ── */}
       <ExpPopup popups={expPopups} />

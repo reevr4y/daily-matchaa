@@ -21,6 +21,24 @@ function todayIso() {
   return new Date().toISOString().slice(0, 10);
 }
 
+// ─── Image compression helper ─────────────────────────────────────────────────
+function compressImage(dataUrl, maxWidth = 600, quality = 0.6) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ratio = Math.min(maxWidth / img.width, maxWidth / img.height, 1);
+      canvas.width = img.width * ratio;
+      canvas.height = img.height * ratio;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const compressed = canvas.toDataURL('image/jpeg', quality);
+      resolve(compressed);
+    };
+    img.src = dataUrl;
+  });
+}
+
 // ─── Sheets via GET params (no CORS issues) ───────────────────────────────────
 async function sheetsRead(sheet) {
   const url = `${SHEETS_API_URL}?action=read&sheet=${sheet}`;
@@ -41,6 +59,51 @@ async function sheetsWrite(action, sheet, data) {
   return JSON.parse(text);
 }
 
+// ─── Upload photo to Google Drive via Apps Script ─────────────────────────────
+async function uploadPhotoToDrive(base64DataUrl, date) {
+  const base64 = base64DataUrl.split(',')[1];
+  const mimeMatch = base64DataUrl.match(/data:(.+?);/);
+  const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+
+  console.log('[Drive] Starting upload, base64 length:', base64?.length ?? 0);
+
+  // ── Gunakan URLSearchParams (application/x-www-form-urlencoded) ─────────────
+  // Ini paling stabil untuk Google Apps Script POST redirects.
+  try {
+    const params = new URLSearchParams();
+    params.append('action', 'upload_photo');
+    params.append('photo',  base64);
+    params.append('date',   date);
+    params.append('mime',   mime);
+
+    const res = await fetch(SHEETS_API_URL, {
+      method:   'POST',
+      body:     params,
+      redirect: 'follow', // Penting agar fetch mengikuti redirect dari GAS
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    const text = await res.text();
+    console.log('[Drive] Upload response:', text.slice(0, 300));
+    
+    try {
+      const json = JSON.parse(text);
+      if (json.photo_url) return json;
+      if (json.error) return json;
+      return { error: 'Unknown response format from server' };
+    } catch (e) {
+      return { error: 'Failed to parse server response: ' + text.slice(0, 50) };
+    }
+  } catch (e) {
+    console.error('[Drive] Upload failed:', e);
+    return { error: 'Connection failed: ' + e.message };
+  }
+}
+
+
 // ─── Hook ─────────────────────────────────────────────────────────────────────
 export function useSheetsAPI() {
   const useSheets = Boolean(SHEETS_API_URL);
@@ -48,7 +111,6 @@ export function useSheetsAPI() {
 
   // ── TASKS ──────────────────────────────────────────────────────────────────
   const fetchTasks = useCallback(async () => {
-    // Always return localStorage immediately (fast + offline-safe)
     const cached = lsGet(LS_TASKS);
 
     if (useSheets) {
@@ -56,7 +118,6 @@ export function useSheetsAPI() {
         setLoading(true);
         const remote = await sheetsRead('tasks');
         if (Array.isArray(remote) && remote.length > 0) {
-          // Merge remote into localStorage (remote is source of truth)
           lsSet(LS_TASKS, remote);
           return remote;
         }
@@ -72,12 +133,9 @@ export function useSheetsAPI() {
 
   const addTask = useCallback(async (title) => {
     const task = { id: makeId(), title, status: 'pending', date: todayIso() };
-
-    // Always update localStorage immediately
     const tasks = lsGet(LS_TASKS);
     lsSet(LS_TASKS, [task, ...tasks]);
 
-    // Also write to Sheets async (fire and forget)
     if (useSheets) {
       sheetsWrite('insert', 'tasks', task).catch(e =>
         console.warn('[Sheets] addTask failed:', e)
@@ -88,7 +146,6 @@ export function useSheetsAPI() {
   }, [useSheets]);
 
   const updateTask = useCallback(async (id, status) => {
-    // Always update localStorage immediately
     const tasks = lsGet(LS_TASKS).map(t => t.id === id ? { ...t, status } : t);
     lsSet(LS_TASKS, tasks);
 
@@ -100,7 +157,6 @@ export function useSheetsAPI() {
   }, [useSheets]);
 
   const deleteTask = useCallback(async (id) => {
-    // Always update localStorage immediately
     const tasks = lsGet(LS_TASKS).filter(t => t.id !== id);
     lsSet(LS_TASKS, tasks);
 
@@ -132,8 +188,6 @@ export function useSheetsAPI() {
 
   const addExpense = useCallback(async (name, amount) => {
     const expense = { id: makeId(), name, amount: Number(amount), date: todayIso() };
-
-    // Always update localStorage immediately
     const expenses = lsGet(LS_EXPENSES);
     lsSet(LS_EXPENSES, [expense, ...expenses]);
 
@@ -147,27 +201,71 @@ export function useSheetsAPI() {
   }, [useSheets]);
 
   // ── PAP (Daily Photo) ──────────────────────────────────────────────────────
-  const addPapRecord = useCallback(async ({ date, status, timestamp }) => {
+  const addPapRecord = useCallback(async ({ date, status, timestamp, photoDataUrl }) => {
     const record = {
       id: makeId(),
       date,
       status,
       timestamp: timestamp || new Date().toISOString(),
+      photo_url: '',
     };
 
-    // Save to localStorage
+    // Save to localStorage immediately
     const history = lsGet(LS_PAP);
     const exists  = history.find(p => p.date === date);
     if (!exists) lsSet(LS_PAP, [record, ...history]);
 
-    // Save to Sheets async (fire & forget)
+    // Upload photo to Google Drive if available
+    if (useSheets && photoDataUrl) {
+      try {
+        const compressed = await compressImage(photoDataUrl, 600, 0.6);
+        const uploadResult = await uploadPhotoToDrive(compressed, date);
+        if (uploadResult.photo_url) {
+          record.photo_url = uploadResult.photo_url;
+
+          // Update localStorage with the Drive URL
+          const updated = lsGet(LS_PAP).map(p =>
+            p.date === date ? { ...p, photo_url: record.photo_url } : p
+          );
+          lsSet(LS_PAP, updated);
+        }
+      } catch (e) {
+        console.warn('[Drive] Photo upload failed:', e);
+      }
+    }
+
+    // Save record to Sheets (with or without photo_url)
     if (useSheets) {
       sheetsWrite('insert', 'pap', record).catch(e =>
         console.warn('[Sheets] addPapRecord failed:', e)
       );
     }
 
+    // Kembalikan record dengan photo_url agar komponen bisa simpan Drive URL
     return record;
+  }, [useSheets]);
+
+  // ── Fetch today's PAP from Sheets (for cross-device sync) ─────────────────
+  const fetchTodayPap = useCallback(async () => {
+    if (!useSheets) return null;
+
+    try {
+      const remote = await sheetsRead('pap');
+      if (!Array.isArray(remote)) return null;
+
+      const today = todayIso();
+      const todayPap = remote.find(p => p.date === today && p.status === 'done');
+      if (todayPap) {
+        const history = lsGet(LS_PAP);
+        const exists = history.find(p => p.date === today);
+        if (!exists) lsSet(LS_PAP, [todayPap, ...history]);
+        return todayPap;
+      }
+      return null;
+    } catch (e) {
+      console.warn('[Sheets] fetchTodayPap failed:', e);
+      return null;
+    }
   }, [useSheets]);
 
   // ── STREAK sync ───────────────────────────────────────────────────────────
@@ -187,6 +285,7 @@ export function useSheetsAPI() {
     fetchExpenses,
     addExpense,
     addPapRecord,
+    fetchTodayPap,
     saveStreakToSheets,
   };
 }
