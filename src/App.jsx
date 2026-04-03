@@ -210,10 +210,15 @@ export default function App() {
   return (
     <div
       className="min-h-screen"
-      style={{ background: 'var(--bg)', transition: 'background 0.3s ease' }}
+      style={{ background: 'var(--bg)', transition: 'background 0.3s ease', position: 'relative', overflow: 'hidden' }}
     >
+      {/* ── Decorative blob shapes ── */}
+      <div className="deco-blob deco-blob-1" aria-hidden="true" />
+      <div className="deco-blob deco-blob-2" aria-hidden="true" />
+      <div className="deco-blob deco-blob-3" aria-hidden="true" />
+
       {/* ── Container ── */}
-      <div className="max-w-2xl mx-auto px-4 py-6 lg:max-w-4xl">
+      <div className="app-container">
 
         {/* ── Header ── */}
         <Header
@@ -224,32 +229,35 @@ export default function App() {
           onToggleDark={() => setDarkMode(d => !d)}
         />
 
-        {/* ── Filter + history button row ── */}
-          <div className="flex items-center gap-2 mb-4">
+        {/* ── Action Bar ── */}
+        <div className="action-bar">
           <FilterBar active={filter} onChange={setFilter} />
-          <button
-            className="history-btn flex-shrink-0"
-            onClick={() => setShowHistory(true)}
-            aria-label="Buka riwayat harian"
-          >
-            <span>📅</span>
-            <span>Riwayat</span>
-          </button>
-          <button
-            className="history-btn flex-shrink-0"
-            onClick={() => setShowWeeklyReport(true)}
-            aria-label="Buka laporan mingguan"
-            style={{ background: 'var(--accent-2)', color: '#fff' }}
-          >
-            <span>📊</span>
-            <span>Laporan</span>
-          </button>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              className="history-btn"
+              onClick={() => setShowHistory(true)}
+              aria-label="Buka riwayat harian"
+            >
+              <span>📅</span>
+              <span>Riwayat</span>
+            </button>
+            <button
+              className="history-btn"
+              onClick={() => setShowWeeklyReport(true)}
+              aria-label="Buka laporan mingguan"
+              style={{ background: 'var(--accent-2)', color: 'var(--text)' }}
+            >
+              <span>📊</span>
+              <span>Laporan</span>
+            </button>
+          </div>
         </div>
 
-        {/* ── Main Grid ── */}
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {/* Left column */}
-          <div className="space-y-4">
+        {/* ── Main 3-Column Grid ── */}
+        <div className="main-grid">
+
+          {/* ── Column 1: Photo + Task + Insight ── */}
+          <div className="col-left">
             <DailyPhotoTask
               onExp={addExp}
               onToast={addToast}
@@ -273,28 +281,29 @@ export default function App() {
             />
           </div>
 
-          {/* Right column */}
-          <div className="space-y-4">
+          {/* ── Column 2: Expense + Chart ── */}
+          <div className="col-center">
             <ExpenseSection
               expenses={expenses}
               filter={filter}
               onAdd={handleAddExpense}
               onToast={addToast}
             />
-
-            {/* Monthly Expense Chart */}
             <ExpenseChart expenses={expenses} />
+          </div>
 
+          {/* ── Column 3: Stats sidebar ── */}
+          <div className="col-right">
             {/* Quick stats card */}
             <div className="card p-5">
-              <div className="section-title mb-3">
+              <div className="section-title mb-4">
                 <span>⚡</span>
                 <span>Status Hari Ini</span>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 <StatTile
                   icon="📋"
-                  label="Tasks"
+                  label="Tasks Hari Ini"
                   value={tasks.filter(t => {
                     const today = new Date().toDateString();
                     return new Date(t.date).toDateString() === today;
@@ -302,7 +311,7 @@ export default function App() {
                 />
                 <StatTile
                   icon="✅"
-                  label="Done"
+                  label="Selesai"
                   value={tasks.filter(t => {
                     const today = new Date().toDateString();
                     return t.status === 'done' && new Date(t.date).toDateString() === today;
@@ -310,9 +319,49 @@ export default function App() {
                 />
                 <StatTile
                   icon="🔥"
-                  label="Streak"
+                  label="Streak Hari"
                   value={`${streak}d`}
                 />
+              </div>
+            </div>
+
+            {/* Motivational quote card */}
+            <div
+              className="card p-5"
+              style={{
+                background: 'linear-gradient(135deg, rgba(214,194,161,0.25), rgba(123,174,127,0.15))',
+                border: '1px solid var(--accent-2)',
+              }}
+            >
+              <div className="text-3xl mb-2 text-center">🌿</div>
+              <p className="text-sm font-medium text-center" style={{ color: 'var(--text)', lineHeight: 1.7 }}>
+                Satu langkah kecil hari ini adalah satu langkah besar untuk masa depan.
+              </p>
+              <p className="text-xs text-center mt-2" style={{ color: 'var(--muted)', fontStyle: 'italic' }}>
+                Keep going, matchaa~ 💕
+              </p>
+            </div>
+
+            {/* Mini calendar */}
+            <div className="card p-5">
+              <div className="section-title mb-3">
+                <span>📆</span>
+                <span>Hari ini</span>
+              </div>
+              <p
+                className="text-2xl font-bold"
+                style={{ color: 'var(--text)', letterSpacing: '-0.02em' }}
+              >
+                {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long' })}
+              </p>
+              <p className="text-sm mt-0.5" style={{ color: 'var(--muted)' }}>
+                {new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric' })}
+              </p>
+              <div
+                className="mt-3 px-3 py-2 rounded-xl text-xs font-semibold text-center"
+                style={{ background: 'var(--accent)', color: 'var(--text)' }}
+              >
+                ✨ Semangat hari ini!
               </div>
             </div>
           </div>

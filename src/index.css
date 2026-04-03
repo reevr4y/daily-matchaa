@@ -1419,3 +1419,126 @@ body {
   .history-sidebar { width: 82px; }
 }
 
+
+/* ═══════════════════════════════════════════════════
+   FULL DESKTOP LAYOUT SYSTEM
+   ═══════════════════════════════════════════════════ */
+
+/* ─── App container ─── */
+.app-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem 3rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Action bar ─── */
+.action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* ─── Main 3-column grid ─── */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.col-left,
+.col-center,
+.col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 768px) {
+  .main-grid {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+  .col-right {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+  }
+}
+
+/* Desktop: 3 columns */
+@media (min-width: 1100px) {
+  .main-grid {
+    grid-template-columns: minmax(0, 1.8fr) minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: 1.75rem;
+    align-items: start;
+  }
+  .col-right {
+    grid-column: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+}
+
+/* ─── Decorative blob shapes ─── */
+.deco-blob {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(70px);
+}
+
+.deco-blob-1 {
+  width: 550px;
+  height: 550px;
+  top: -180px;
+  right: -130px;
+  background: radial-gradient(circle, rgba(214,194,161,0.28) 0%, transparent 70%);
+}
+
+.deco-blob-2 {
+  width: 420px;
+  height: 420px;
+  bottom: -120px;
+  left: -110px;
+  background: radial-gradient(circle, rgba(123,174,127,0.20) 0%, transparent 70%);
+}
+
+.deco-blob-3 {
+  width: 320px;
+  height: 320px;
+  top: 45%;
+  left: 42%;
+  background: radial-gradient(circle, rgba(196,168,130,0.12) 0%, transparent 70%);
+}
+
+/* Hide large blobs / shrink on mobile */
+@media (max-width: 640px) {
+  .deco-blob-1 { width: 220px; height: 220px; opacity: 0.5; }
+  .deco-blob-2 { width: 180px; height: 180px; opacity: 0.4; }
+  .deco-blob-3 { display: none; }
+
+  .app-container {
+    padding: 1rem 1rem 4rem;
+  }
+  .action-bar {
+    margin-bottom: 1rem;
+  }
+  .main-grid {
+    gap: 1rem;
+  }
+  .col-left,
+  .col-center,
+  .col-right {
+    gap: 1rem;
+  }
+}
