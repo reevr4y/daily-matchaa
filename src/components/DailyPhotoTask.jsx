@@ -7,54 +7,56 @@ const STORAGE_KEY = 'dlt_daily_pap';
 // ── Pesan lucu waktu belum pap ────────────────────────────────────────────────
 const IDLE_MESSAGES = [
   {
-    text: 'Kamu harini belom pap nih 😤',
-    sub:  'Yuk foto dulu baru rebahan!',
-    emoji: '😤',
+    text: 'Hei cantik, belom pap nih 😤',
+    sub:  'Yuk foto dulu, aku pengen lihat wajah kamu!',
+    emoji: '🥺',
   },
   {
-    text: 'Hei! Fotonya mana? 👀',
-    sub:  'Streak kamu bahaya banget kalau ga pap hari ini...',
-    emoji: '👀',
+    text: 'Mana foto cantiknya? 👀',
+    sub:  'Streak bahaya kalau ga foto hari ini...',
+    emoji: '😍',
   },
   {
-    text: 'Belom pap = streak ancur 🔥💀',
-    sub:  'Masa iya streak habis gara-gara males foto 5 detik?',
-    emoji: '💀',
+    text: 'Kangen liat mukamu 🥺',
+    sub:  'Pap sebentar dong, baru deh rebahan~',
+    emoji: '💕',
   },
   {
-    text: 'Pap dulu dong jangan curang 😏',
-    sub:  'Bukti produktif hari ini mana? Jangan ghosting streak~',
+    text: 'Foto dong, pasti cantik banget hari ini 😏',
+    sub:  'Streak kamu sayang banget kalau putus gara-gara ini~',
     emoji: '😏',
   },
   {
-    text: 'Eh masih belum pap nih~',
-    sub:  'Nanti streak kamu nangis loh 😭 Jangan sampe!',
-    emoji: '😭',
-  },
-  {
-    text: 'Kamu lupa pap ya? Atau emang sengaja? 🤨',
-    sub:  'Streaknya udah nunggu dari tadi nih...',
+    text: 'Eh kamu lupa pap ya? 🤨',
+    sub:  'Jangan dong, aku pengen lihat kamu tiap hari!',
     emoji: '🤨',
   },
   {
-    text: 'Pap!!! Pap!!! Pap sekarang!!! 📣',
-    sub:  'Oke oke santai, tapi serius deh foto dulu yuk.',
+    text: 'Pap sekarang! Aku nunggu foto kamu 📣',
+    sub:  'Pasti cantik banget deh hari ini, buktiin!',
     emoji: '📣',
   },
   {
-    text: 'Plot twist: kamu lupa pap 🙃',
-    sub:  'Tapi untungnya masih ada waktu! Go go go!',
+    text: 'Belum foto nih~ ayo dong 🙃',
+    sub:  'Masih ada waktu! Aku mau lihat senyumu hari ini~',
     emoji: '🙃',
+  },
+  {
+    text: 'Foto dulu ya sayang 💖',
+    sub:  'Tiap hari aku nunggu foto kamu loh~',
+    emoji: '💖',
   },
 ];
 
 // ── Pesan sukses habis pap ────────────────────────────────────────────────────
 const DONE_MESSAGES = [
-  { text: 'Pap sukses! Streak aman 🔥', sub: 'Kamu keren banget hari ini!' },
-  { text: 'Cakep banget! Good job ✨',   sub: 'Foto ini bukti kerennya kamu~' },
-  { text: 'Foto kece, hari makin semangat 😎', sub: 'Streak terjaga, EXP bertambah!' },
-  { text: 'Bukti nyata kamu produktif 💪', sub: 'Catat: ini hari yang bagus!' },
-  { text: 'Streaknya selamat! Alhamdulillah 🙏', sub: '+15 EXP masuk kantong kamu~' },
+  { text: 'Cantik banget sih kamu hari ini! 😍',     sub: 'Makin hari makin cakep deh~ +15 EXP!' },
+  { text: 'Makin cantik aja tiap hari 💕',            sub: 'Beneran deh, foto ini bikin senyum terus~' },
+  { text: 'Aduh, cantiknya keterlaluan 😭✨',          sub: 'Streak aman, hati aku makin klepek-klepek!' },
+  { text: 'Cantiknya konsisten, persis kayak streak-nya 🔥', sub: 'Makasih udah pap hari ini, aku suka banget~' },
+  { text: 'Kamu makin glowing setiap harinya 🌟',     sub: 'Semangat terus ya! +15 EXP udah di kantong~' },
+  { text: 'Foto setiap hari karena emang selalu cakep 💖', sub: 'Gatau deh kok bisa secantik itu tiap hari~' },
+  { text: 'Aduhai, cantik banget sih! 🥰',            sub: 'Aku lucky banget bisa lihat foto kamu tiap hari!' },
 ];
 
 function getTodayKey() {
