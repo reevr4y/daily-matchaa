@@ -10,7 +10,7 @@ import {
 
 const periodLabel = { daily: 'Hari Ini', weekly: '7 Hari', monthly: '30 Hari' };
 
-export default function InsightCard({ tasks, expenses, filter }) {
+export default function InsightCard({ tasks, expenses, filter, settings }) {
   const filteredExpenses = filterByPeriod(expenses, filter);
   const filteredTasks    = filterByPeriod(tasks, filter);
 
@@ -20,7 +20,7 @@ export default function InsightCard({ tasks, expenses, filter }) {
   const mostExpense      = getMostFrequentExpense(filteredExpenses);
   const bestDay          = getMostProductiveDay(tasks); // all time for best day
 
-  const spendMsg  = getSpendingMessage(totalSpending);
+  const spendMsg  = getSpendingMessage(totalSpending, filter, settings);
   const prodMsg   = getProductivityMessage(completedCount);
 
   const msgColor = {

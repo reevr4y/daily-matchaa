@@ -41,10 +41,14 @@ export function getMostProductiveDay(tasks) {
   return Object.entries(dayCount).sort((a, b) => b[1] - a[1])[0]?.[0] || null;
 }
 
-export function getSpendingMessage(total, prevTotal) {
-  if (total === 0) return { text: 'Hemat banget hari ini! 🌿', type: 'good' };
-  if (total > 100000) return { text: 'Dompet kamu nangis 😭', type: 'warn' };
-  if (prevTotal && total > prevTotal * 1.3) return { text: 'Hari ini lebih boros 😏', type: 'warn' };
+export function getSpendingMessage(total, filter = 'daily', settings = { daily: 100000, weekly: 700000, monthly: 2000000 }) {
+  if (total === 0) return { text: 'Hemat banget periode ini! 🌿', type: 'good' };
+  
+  const limit = settings[filter] || 100000;
+  
+  if (total > limit) return { text: 'Dompet kamu nangis 😭', type: 'warn' };
+  if (total > limit * 0.8) return { text: 'Hampir batas belanja nih 🧐', type: 'neutral' };
+  
   return { text: 'Pengeluaran terkendali ✨', type: 'neutral' };
 }
 

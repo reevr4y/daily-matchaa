@@ -17,6 +17,7 @@ import { fireConfetti }  from './utils/confetti';
 import ExpenseChart   from './components/ExpenseChart';
 import WeeklyReport, { useWeeklyReportTrigger } from './components/WeeklyReport';
 import FloatingDecorations from './components/FloatingDecorations';
+import SettingsModal from './components/SettingsModal';
 
 export default function App() {
   // ── Dark mode ────────────────────────────────────────────────────────────
@@ -24,6 +25,12 @@ export default function App() {
   const [theme, setTheme]       = useLocalStorage('dlt_theme', 'matcha');
   const [showWelcome, setShowWelcome] = useState(true);
   const [showHistory, setShowHistory] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [settings, setSettings] = useLocalStorage('dlt_settings', {
+    daily: 100000,
+    weekly: 700000,
+    monthly: 2000000
+  });
   const { show: showWeeklyReport, setShow: setShowWeeklyReport, dismiss: dismissWeekly } = useWeeklyReportTrigger();
   
   useEffect(() => {
@@ -328,6 +335,7 @@ export default function App() {
               streak={streak}
               darkMode={darkMode}
               onToggleDark={() => setDarkMode(d => !d)}
+              onShowSettings={() => setShowSettings(true)}
               theme={theme}
               onThemeChange={setTheme}
             />
@@ -449,6 +457,7 @@ export default function App() {
               tasks={tasks}
               expenses={expenses}
               filter={filter}
+              settings={settings}
             />
           </div>
 
@@ -493,6 +502,16 @@ export default function App() {
 
       {/* ── Toasts ── */}
       <FeedbackToast toasts={toasts} />
+
+      {/* ── Settings Modal ── */}
+      {showSettings && (
+        <SettingsModal
+          settings={settings}
+          setSettings={setSettings}
+          onClose={() => setShowSettings(false)}
+          onToast={addToast}
+        />
+      )}
     </div>
   );
 }

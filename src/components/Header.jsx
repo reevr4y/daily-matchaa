@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import ThemePicker from './ThemePicker';
 
-export default function Header({ levelInfo, exp, streak, darkMode, onToggleDark, theme, onThemeChange }) {
+export default function Header({ levelInfo, exp, streak, darkMode, onToggleDark, onShowSettings, theme, onThemeChange }) {
   const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
@@ -32,6 +32,16 @@ export default function Header({ levelInfo, exp, streak, darkMode, onToggleDark,
                 <span className="streak-fire">🔥</span> {streak}d
               </div>
             )}
+
+            {/* Settings button */}
+            <button
+              onClick={onShowSettings}
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-accent border-[1.5px] border-accent-2 hover:scale-110 active:scale-95 transition-all text-base flex-shrink-0"
+              title="Pengaturan"
+              aria-label="Open settings"
+            >
+              ⚙️
+            </button>
 
             {/* Dark mode toggle */}
             <button
