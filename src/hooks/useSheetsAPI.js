@@ -50,15 +50,14 @@ async function sheetsRead(sheet) {
 }
 
 async function sheetsWrite(action, sheet, data) {
-  // Gunakan POST (URLSearchParams) untuk konsistensi dan reliabilitas
-  const params = new URLSearchParams();
-  params.append('action', action);
-  params.append('sheet',  sheet);
-  params.append('data',   JSON.stringify(data));
-
+  // Gunakan 'text/plain' supaya tidak ter-mangle oleh URL-encoding
+  // dan menghindari preflight OPTIONS yang lambat di GAS.
+  const payload = { action, sheet, data };
+  
   const res  = await fetch(SHEETS_API_URL, {
     method: 'POST',
-    body:   params,
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload),
     redirect: 'follow',
   });
   const text = await res.text();
@@ -73,19 +72,21 @@ async function uploadPhotoToDrive(base64DataUrl, date) {
 
   console.log('[Drive] Starting upload, base64 length:', base64?.length ?? 0);
 
-  // ── Gunakan URLSearchParams (application/x-www-form-urlencoded) ─────────────
-  // Ini paling stabil untuk Google Apps Script POST redirects.
+  // ── Gunakan text/plain JSON POST ──
+  // Menghindari karakter '+' di base64 berubah jadi spasi di server.
   try {
-    const params = new URLSearchParams();
-    params.append('action', 'upload_photo');
-    params.append('photo',  base64);
-    params.append('date',   date);
-    params.append('mime',   mime);
+    const payload = {
+      action: 'upload_photo',
+      photo:  base64,
+      date:   date,
+      mime:   mime
+    };
 
     const res = await fetch(SHEETS_API_URL, {
       method:   'POST',
-      body:     params,
-      redirect: 'follow', // Penting agar fetch mengikuti redirect dari GAS
+      headers:  { 'Content-Type': 'text/plain' },
+      body:     JSON.stringify(payload),
+      redirect: 'follow',
     });
 
     if (!res.ok) {

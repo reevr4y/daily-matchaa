@@ -128,12 +128,15 @@ function handlePhotoUploadGet(e) {
     const blob     = Utilities.newBlob(Utilities.base64Decode(base64Data), mimeType, 'pap_' + date + '.jpg');
     const folder   = getPapFolder();
     const file     = folder.createFile(blob);
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-
-    const fileId   = file.getId();
-    const photoUrl = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w800';
-
-    return jsonResponse({ success: true, photo_url: photoUrl, file_id: fileId });
+    // Seringkali thumbnail API lambat/tidak stabil di device lain.
+    // Gunakan 'uc?export=view' yang lebih direct untuk ditampilkan di <img> tag.
+    const url = 'https://docs.google.com/uc?export=view&id=' + file.getId();
+    
+    return jsonResponse({
+      success:   true,
+      photo_url: url,
+      file_id:   file.getId()
+    });
   } catch (err) {
     return jsonResponse({ error: 'Photo upload failed: ' + err.message });
   }
@@ -145,15 +148,14 @@ function doPost(e) {
     let payload;
     
     // ── Handle different content types (Simple requests vs JSON) ──────────────
-    if (e.postData && e.postData.type === 'application/json') {
-      payload = JSON.parse(e.postData.contents);
-    } else {
-      // Fallback: try to get from e.parameter (for application/x-www-form-urlencoded)
-      // or try to parse postData.contents as JSON anyway
-      payload = e.parameter;
-      if (!payload.action && e.postData && e.postData.contents) {
-        try { payload = JSON.parse(e.postData.contents); } catch(x) {}
+    if (e.postData && e.postData.contents) {
+      try {
+        payload = JSON.parse(e.postData.contents);
+      } catch (err) {
+        payload = e.parameter || {};
       }
+    } else {
+      payload = e.parameter || {};
     }
 
     const { action, sheet: sheetName, data: rawData } = payload;
@@ -218,11 +220,12 @@ function handlePhotoUploadPost(payload) {
       return jsonResponse({ error: 'No photo data provided (Payload empty)' });
     }
 
-    // Clean up base64 if it has prefix (should be handled by client, but let's be safe)
-    let cleanBase64 = photo;
-    if (photo.indexOf(',') > -1) cleanBase64 = photo.split(',')[1];
+    // FIX: Google Apps Script sering mengubah '+' menjadi spasi ' ' 
+    // dalam e.parameter (url-encoded). Kita kembalikan ke '+'.
+    let cleanBase64 = photo.replace(/ /g, '+');
+    if (cleanBase64.indexOf(',') > -1) cleanBase64 = cleanBase64.split(',')[1];
 
-    const blob     = Utilities.newBlob(Utilities.base64Decode(cleanBase64), mimeType, 'pap_' + dateStr + '.jpg');
+    const blob     = Utilities.newBlob(Utilities.base64Decode(cleanBase64), mimeType, 'PAP_' + dateStr + '.jpg');
     const folder   = getPapFolder();
     const file     = folder.createFile(blob);
     
