@@ -6,6 +6,7 @@ import ExpenseSection from './components/ExpenseSection';
 import InsightCard    from './components/InsightCard';
 import DailyPhotoTask from './components/DailyPhotoTask';
 import FeedbackToast, { useToast } from './components/FeedbackToast';
+import WelcomeCard    from './components/WelcomeCard';
 import { useGameState }  from './hooks/useGameState';
 import { useSheetsAPI }  from './hooks/useSheetsAPI';
 import { useLocalStorage } from './hooks/useLocalStorage';
@@ -14,6 +15,7 @@ import { fireConfetti }  from './utils/confetti';
 export default function App() {
   // ── Dark mode ────────────────────────────────────────────────────────────
   const [darkMode, setDarkMode] = useLocalStorage('dlt_dark', false);
+  const [showWelcome, setShowWelcome] = useState(true);
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
   }, [darkMode]);
@@ -208,10 +210,18 @@ export default function App() {
         </div>
 
         {/* ── Footer ── */}
-        <p className="text-center text-xs mt-8 pb-6" style={{ color: 'var(--muted)' }}>
-          Made with 🌿 · Daily Life Tracker
-        </p>
+        <div className="footer-credit">
+          <p>
+            Made with <span className="heart">❤️</span> by <span className="creator-name">Hengky</span>
+          </p>
+          <p style={{ marginTop: '0.25rem' }}>
+            specially for <span className="for-name">matchaa</span> 🍵
+          </p>
+        </div>
       </div>
+
+      {/* ── Welcome Card ── */}
+      {showWelcome && <WelcomeCard onDismiss={() => setShowWelcome(false)} />}
 
       {/* ── Toasts ── */}
       <FeedbackToast toasts={toasts} />
