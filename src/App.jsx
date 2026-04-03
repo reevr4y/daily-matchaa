@@ -13,12 +13,15 @@ import { useGameState }  from './hooks/useGameState';
 import { useSheetsAPI }  from './hooks/useSheetsAPI';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { fireConfetti }  from './utils/confetti';
+import ExpenseChart   from './components/ExpenseChart';
+import WeeklyReport, { useWeeklyReportTrigger } from './components/WeeklyReport';
 
 export default function App() {
   // ── Dark mode ────────────────────────────────────────────────────────────
   const [darkMode, setDarkMode] = useLocalStorage('dlt_dark', false);
   const [showWelcome, setShowWelcome] = useState(true);
   const [showHistory, setShowHistory] = useState(false);
+  const { show: showWeeklyReport, setShow: setShowWeeklyReport, dismiss: dismissWeekly } = useWeeklyReportTrigger();
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
   }, [darkMode]);
@@ -208,7 +211,7 @@ export default function App() {
         />
 
         {/* ── Filter + history button row ── */}
-        <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2 mb-4">
           <FilterBar active={filter} onChange={setFilter} />
           <button
             className="history-btn flex-shrink-0"
@@ -217,6 +220,15 @@ export default function App() {
           >
             <span>📅</span>
             <span>Riwayat</span>
+          </button>
+          <button
+            className="history-btn flex-shrink-0"
+            onClick={() => setShowWeeklyReport(true)}
+            aria-label="Buka laporan mingguan"
+            style={{ background: 'var(--accent-2)', color: '#fff' }}
+          >
+            <span>📊</span>
+            <span>Laporan</span>
           </button>
         </div>
 
@@ -255,6 +267,9 @@ export default function App() {
               onAdd={handleAddExpense}
               onToast={addToast}
             />
+
+            {/* Monthly Expense Chart */}
+            <ExpenseChart expenses={expenses} />
 
             {/* Quick stats card */}
             <div className="card p-5">
@@ -302,6 +317,17 @@ export default function App() {
 
       {/* ── Welcome Card ── */}
       {showWelcome && <WelcomeCard onDismiss={() => setShowWelcome(false)} />}
+
+      {/* ── Weekly Report Modal ── */}
+      {showWeeklyReport && (
+        <WeeklyReport
+          tasks={tasks}
+          expenses={expenses}
+          streak={streak}
+          exp={exp}
+          onClose={dismissWeekly}
+        />
+      )}
 
       {/* ── History Modal ── */}
       {showHistory && (
