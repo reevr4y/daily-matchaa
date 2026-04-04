@@ -54,22 +54,36 @@ export function playMeow() {
   try {
     const ctx = getAudioContext();
     const osc = ctx.createOscillator();
+    const filter = ctx.createBiquadFilter();
     const gain = ctx.createGain();
 
-    osc.connect(gain);
+    osc.connect(filter);
+    filter.connect(gain);
     gain.connect(ctx.destination);
 
     const now = ctx.currentTime;
-    osc.type = 'triangle'; 
+    
+    // Meow is best approximated by a sawtooth wave for vocal richness
+    osc.type = 'sawtooth';
 
-    osc.frequency.setValueAtTime(400, now);
-    osc.frequency.exponentialRampToValueAtTime(600, now + 0.1); 
-    osc.frequency.exponentialRampToValueAtTime(450, now + 0.4); 
+    // Pitch envelope: slides up slightly then down
+    osc.frequency.setValueAtTime(600, now);
+    osc.frequency.exponentialRampToValueAtTime(750, now + 0.15); // "me"
+    osc.frequency.exponentialRampToValueAtTime(450, now + 0.45); // "ow"
+    
+    // Formant sweep (Vocal Tract filter)
+    // This creates the "me -> ow" vowel transition sound
+    filter.type = 'bandpass';
+    filter.Q.value = 5.0; // Vocal resonance
+    filter.frequency.setValueAtTime(1000, now); // Vowel 'e'
+    filter.frequency.exponentialRampToValueAtTime(1600, now + 0.15); // Vowel 'a' peak
+    filter.frequency.exponentialRampToValueAtTime(600, now + 0.5); // Vowel 'u/ow' decay
 
+    // Volume envelope
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.1, now + 0.05);
-    gain.gain.linearRampToValueAtTime(0.08, now + 0.3);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+    gain.gain.linearRampToValueAtTime(0.08, now + 0.05); // Attack
+    gain.gain.linearRampToValueAtTime(0.1, now + 0.15);  // Peak
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55); // Release
 
     osc.start(now);
     osc.stop(now + 0.6);
