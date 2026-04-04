@@ -1801,43 +1801,44 @@ body {
 }
 
 .machii-sprite {
-  width: 64px;
-  height: 64px;
+  width: 150px;
+  height: 150px;
   background-image: url('/assets/buddy_machii_sprite.png');
-  background-size: 256px 256px; /* Assuming 4x4 grid */
-  image-rendering: pixelated;
+  background-size: 600px 600px; /* Assuming 4x4 grid of 150x150 */
+  background-position: -50px -50px; /* Adjusting offset, the generated image might not be a perfect grid */
+  image-rendering: auto;
   pointer-events: auto;
   cursor: pointer;
 }
 
 .machii-sprite.idle {
   animation: machiiIdle 0.8s steps(4) infinite;
-  background-position-y: 0px;
+  background-position-y: -50px;
 }
 
 .machii-sprite.walk {
   animation: machiiWalk 0.6s steps(4) infinite;
-  background-position-y: -64px;
+  background-position-y: -200px;
 }
 
 .machii-sprite.happy {
   animation: machiiHappy 0.4s steps(4) infinite;
-  background-position-y: -128px;
+  background-position-y: -350px;
 }
 
 @keyframes machiiIdle {
-  from { background-position-x: 0px; }
-  to { background-position-x: -256px; }
+  from { background-position-x: -50px; }
+  to { background-position-x: -650px; }
 }
 
 @keyframes machiiWalk {
-  from { background-position-x: 0px; }
-  to { background-position-x: -256px; }
+  from { background-position-x: -50px; }
+  to { background-position-x: -650px; }
 }
 
 @keyframes machiiHappy {
-  from { background-position-x: 0px; }
-  to { background-position-x: -256px; }
+  from { background-position-x: -50px; }
+  to { background-position-x: -650px; }
 }
 
 .machii-name-tag {
