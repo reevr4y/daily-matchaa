@@ -1823,7 +1823,7 @@ body {
 
 .machii-sprite.happy {
   background-image: url('/assets/machii_happy.png');
-  animation: spriteHappy 0.6s steps(5) infinite;
+  animation: spriteHappy 0.6s steps(4) infinite;
 }
 
 @keyframes spriteIdle {
@@ -1838,7 +1838,7 @@ body {
 
 @keyframes spriteHappy {
   from { background-position-x: 0; }
-  to { background-position-x: calc(-120px * 5); }
+  to { background-position-x: calc(-120px * 4); }
 }
 
 .machii-name-tag {
