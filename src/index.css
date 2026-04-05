@@ -2021,3 +2021,57 @@ body {
   animation: trail-float 1.5s forwards ease-out;
 }
 
+/* ─── Background Effects (Dark Mode) ─── */
+.sky-effects-container {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+.dark .sky-effects-container {
+  opacity: 1;
+}
+
+.aurora-blob {
+  position: absolute;
+  width: 70vw;
+  height: 50vh;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.15;
+  mix-blend-mode: screen;
+  animation: aurora-float 25s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-float {
+  0% { transform: translate(-20%, -20%) scale(1) rotate(0deg); opacity: 0.1; }
+  33% { transform: translate(10%, 5%) scale(1.2) rotate(10deg); opacity: 0.2; }
+  66% { transform: translate(-5%, 15%) scale(1) rotate(-5deg); opacity: 0.15; }
+  100% { transform: translate(15%, -10%) scale(1.1) rotate(3deg); opacity: 0.12; }
+}
+
+.shooting-star-layer {
+  position: absolute;
+  inset: 0;
+}
+
+.shooting-star {
+  position: absolute;
+  background: linear-gradient(90deg, rgba(255,255,255,1), rgba(255,255,255,0));
+  height: 2px;
+  filter: drop-shadow(0 0 5px white);
+  opacity: 0;
+}
+
+@keyframes shooting-star-anim {
+  0% { transform: translateX(0) translateY(0) rotate(-45deg) scaleX(0); opacity: 0; }
+  10% { transform: translateX(0) translateY(0) rotate(-45deg) scaleX(1); opacity: 1; }
+  25% { transform: translateX(-400px) translateY(400px) rotate(-45deg) scaleX(1); opacity: 0; }
+  100% { transform: translateX(-400px) translateY(400px) rotate(-45deg) scaleX(1); opacity: 0; }
+}
+
+

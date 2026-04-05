@@ -23,6 +23,8 @@ import AuraEffect from './components/AuraEffect';
 import ScrapbookModal from './components/ScrapbookModal';
 import InteractiveTrails from './components/InteractiveTrails';
 import StickerManager from './components/StickerManager';
+import SkyEffects from './components/SkyEffects';
+
 
 export default function App() {
   // ── Dark mode ────────────────────────────────────────────────────────────
@@ -331,7 +333,9 @@ export default function App() {
       style={{ background: 'var(--bg)', transition: 'background 0.3s ease', position: 'relative', overflow: 'hidden' }}
     >
       {/* ── Decorative elements ── */}
+      <SkyEffects theme={theme} />
       <FloatingDecorations theme={theme} />
+
       <div className="deco-blob deco-blob-1" aria-hidden="true" />
       <div className="deco-blob deco-blob-2" aria-hidden="true" />
       <div className="deco-blob deco-blob-3" aria-hidden="true" />
