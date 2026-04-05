@@ -21,6 +21,8 @@ import SettingsModal from './components/SettingsModal';
 import DeskBuddy from './components/DeskBuddy';
 import AuraEffect from './components/AuraEffect';
 import ScrapbookModal from './components/ScrapbookModal';
+import InteractiveTrails from './components/InteractiveTrails';
+import StickerManager from './components/StickerManager';
 
 export default function App() {
   // ── Dark mode ────────────────────────────────────────────────────────────
@@ -82,7 +84,7 @@ export default function App() {
   useEffect(() => {
     if (streakBroke) {
       setTimeout(() => {
-        addToast('Aduh! Streak kemarin putus gara-gara ga pap 😭 Mulai lagi ya!', 'warn');
+        addToast('Aduh! Streak kemarin putus gara-gara ga absen 😭 Mulai lagi ya!', 'warn');
       }, 1500);
     }
   }, [streakBroke]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -103,12 +105,18 @@ export default function App() {
           const localExp    = localStored ? Number(JSON.parse(localStored)) : 0;
           const remoteExp   = Number(remoteState.exp || 0);
           const remoteStreak = Number(remoteState.streak || 0);
+          const remoteSettings = remoteState.settings;
 
-          if (remoteExp > localExp + 5) {
+          if (remoteExp > localExp + 5 || remoteSettings) {
             isSyncingRef.current = true;
             localStorage.setItem('dlt_exp',        JSON.stringify(remoteExp));
             localStorage.setItem('dlt_streak',     JSON.stringify(remoteStreak));
             localStorage.setItem('dlt_lastActive', JSON.stringify(remoteState.last_active || ''));
+            
+            if (remoteSettings) {
+              localStorage.setItem('dlt_settings', JSON.stringify(remoteSettings));
+              setSettings(remoteSettings);
+            }
             
             // Update state directly
             setExp(remoteExp);
@@ -160,13 +168,14 @@ export default function App() {
         updateGameState({ 
           exp, 
           streak, 
+          settings,
           last_active: localStorage.getItem('dlt_lastActive')?.replace(/"/g, '') || '' 
         });
       }, 2000); // 2 second debounce
     }
     
     return () => { if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current); };
-  }, [exp, streak, ready, updateGameState]); 
+  }, [exp, streak, ready, updateGameState, settings]); 
 
   // ── ONE-TIME RESET to 150 (USER REQUEST) ──────────────────────────────────
   useEffect(() => {
@@ -544,6 +553,12 @@ export default function App() {
           papRecords={JSON.parse(localStorage.getItem('dlt_pap_history') || '[]')}
         />
       )}
+
+      {/* ── Sticker Manager ── */}
+      <StickerManager />
+
+      {/* ── Interactive Trails ── */}
+      <InteractiveTrails />
     </div>
   );
 }

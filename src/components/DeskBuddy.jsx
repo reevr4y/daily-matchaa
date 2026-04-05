@@ -13,10 +13,12 @@ export default function DeskBuddy({ tasksCompletedToday = 0 }) {
   const [state, setState] = useState('idle');
   const [activeMessage, setActiveMessage] = useState(null);
   
-  // Pacing Physics State
+  // Pacing State
   const [offsetX, setOffsetX] = useState(0);
   const [direction, setDirection] = useState(1);
+  const [lookAt, setLookAt] = useState({ x: 0, y: 0 });
   const isWalkingRef = useRef(false);
+  const containerRef = useRef(null);
 
   const lastMsgIdxRef = useRef(-1);
   const messageTimeoutRef = useRef(null);
@@ -27,12 +29,33 @@ export default function DeskBuddy({ tasksCompletedToday = 0 }) {
     }
   }, [tasksCompletedToday]);
 
+  // Eye/Face tracking logic
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!containerRef.current || isWalkingRef.current) return;
+      
+      const rect = containerRef.current.getBoundingClientRect();
+      const catX = rect.left + rect.width / 2;
+      const catY = rect.top + rect.height / 2;
+      
+      const angleX = (e.clientX - catX) / 100;
+      const angleY = (e.clientY - catY) / 100;
+      
+      setLookAt({
+        x: Math.max(-8, Math.min(8, angleX * 5)),
+        y: Math.max(-5, Math.min(5, angleY * 5))
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   const triggerHappy = useCallback((isClick = false) => {
     setState('happy');
     playMeow();
 
     if (isClick) {
-      // Pick random message
       let nextIdx = Math.floor(Math.random() * MESSAGES.length);
       if (nextIdx === lastMsgIdxRef.current) {
         nextIdx = (nextIdx + 1) % MESSAGES.length;
@@ -57,75 +80,90 @@ export default function DeskBuddy({ tasksCompletedToday = 0 }) {
       if (Math.random() > 0.6 && state === 'idle' && !isWalkingRef.current) {
         startPacing();
       }
-    }, 15000); // Decide every 15s
+    }, 12000); // Check more often
 
     return () => clearInterval(paceTimer);
   }, [state]);
 
   const startPacing = () => {
+    if (isWalkingRef.current) return;
     isWalkingRef.current = true;
+    setLookAt({ x: 0, y: 0 });
+    
+    // 1. Determine direction
+    const walkRight = Math.random() > 0.5;
+    const dist = 350; // Long distance
+    const targetX = walkRight ? dist : -dist;
+    
+    // 2. Set direction and start walk animation
+    setDirection(walkRight ? 1 : -1);
     setState('walk');
     
-    // Choose right or left
-    const walkRight = Math.random() > 0.5;
-    const targetX = walkRight ? 60 : -60; // Walk 60px
-    
-    setDirection(walkRight ? 1 : -1);
-    
-    // Slight delay to allow facing to update before translating
+    // 3. Move after a frame
     setTimeout(() => {
         setOffsetX(targetX);
     }, 50);
 
-    // Wait for walk out
+    // 4. After walk forward (5s) -> Flip and walk back
     setTimeout(() => {
-      // Walk back
+      // Done walking out -> Flip instantly
       setDirection(walkRight ? -1 : 1);
       
+      // Wait for flip, then move back
       setTimeout(() => {
           setOffsetX(0);
-      }, 50);
-      
-      // Wait for walk back
-      setTimeout(() => {
-         isWalkingRef.current = false;
-         setState('idle');
-         setDirection(1); // Default face right
-      }, 3000);
-    }, 4000); // Hang out for a sec before walking back
+          
+          // 5. After walk back (5s) -> Go back to idle
+          setTimeout(() => {
+            isWalkingRef.current = false;
+            setState('idle');
+            setDirection(1); // Default face right
+          }, 5000);
+      }, 100); 
+    }, 6000); // Wait 1s extra at destination
   };
 
   return (
-    <div className="flex flex-col items-center pointer-events-auto relative z-[100] mt-8 mb-4">
+    <div 
+      ref={containerRef}
+      className="flex flex-col items-center pointer-events-auto relative z-[100] mt-8 mb-4 transition-transform duration-300"
+    >
       
+      {/* --- Translate Container (The Walk Speed) --- */}
       <div 
-         className="relative transition-all"
+         className="relative transition-transform"
          style={{ 
-             transform: `translateX(${offsetX}px) scaleX(${direction})`,
-             transitionDuration: state === 'walk' ? '3s' : '0.4s',
-             transitionProperty: 'transform',
+             transform: `translateX(${offsetX}px)`,
+             transitionDuration: state === 'walk' ? '5s' : '0.4s',
              transitionTimingFunction: 'linear'
          }}
       >
-          {/* ── Chat Bubble ── */}
-          {activeMessage && (
-            <div className="machii-chat-bubble" style={{ transform: `scaleX(${direction})` }}>
-              {activeMessage}
-            </div>
-          )}
+          {/* --- Flip Container (Invisible Rotation) --- */}
+          <div style={{ transform: `scaleX(${direction})` }}>
+              
+              {/* ── Chat Bubble ── */}
+              {activeMessage && (
+                <div className="machii-chat-bubble" style={{ transform: `scaleX(${direction})` }}>
+                  {activeMessage}
+                </div>
+              )}
 
-          {/* ── Name Tag ── */}
-          <div className="machii-name-tag absolute -top-4 flex justify-center w-full z-10 pointer-events-none" style={{ transform: `scaleX(${direction})` }}>
-            <span className="machii-name-text">Machii 🐱</span>
+              {/* ── Name Tag ── */}
+              <div 
+                className="machii-name-tag absolute -top-4 flex justify-center w-full z-10 pointer-events-none transition-transform duration-200" 
+                style={{ transform: `scaleX(${direction}) translate(${lookAt.x * 0.5}px, ${lookAt.y * 0.5}px)` }}
+              >
+                <span className="machii-name-text">Machii 🐱</span>
+              </div>
+
+              {/* ── Cat Sprite ── */}
+              <div 
+                className={`machii-sprite ${state} filter drop-shadow-md cursor-pointer transition-transform duration-200`} 
+                style={{ transform: `translate(${lookAt.x}px, ${lookAt.y}px)` }}
+                onClick={() => triggerHappy(true)}
+              />
           </div>
-
-          {/* ── Cat Sprite ── */}
-          <div 
-            className={`machii-sprite ${state} filter drop-shadow-md`} 
-            onClick={() => triggerHappy(true)}
-          />
       </div>
     </div>
   );
 }
-

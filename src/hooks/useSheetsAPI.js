@@ -304,7 +304,7 @@ export function useSheetsAPI() {
     );
   }, [useSheets]);
 
-  // ── GAME STATE (EXP, Streak) Sync ──────────────────────────────────────────
+  // ── GAME STATE (EXP, Streak, Settings) Sync ──────────────────────────────
   const fetchGameState = useCallback(async () => {
     if (!useSheets) return null;
     try {
@@ -314,7 +314,15 @@ export function useSheetsAPI() {
         const latest = [...remote]
           .filter(r => r.updated_at && !isNaN(new Date(r.updated_at).getTime()))
           .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())[0];
-        return latest || remote[remote.length - 1]; // Fallback to last row if sort fails
+        
+        const result = latest || remote[remote.length - 1];
+        
+        if (result && result.settings_json) {
+           try {
+             result.settings = JSON.parse(result.settings_json);
+           } catch(e) { console.warn('[Sheets] Failed to parse settings_json'); }
+        }
+        return result;
       }
     } catch (e) {
       console.warn('[Sheets] fetchGameState failed:', e);
@@ -322,12 +330,17 @@ export function useSheetsAPI() {
     return null;
   }, [useSheets]);
 
-  const updateGameState = useCallback(async ({ exp, streak, last_active }) => {
+  const updateGameState = useCallback(async ({ exp, streak, last_active, settings }) => {
     if (!useSheets) return;
     try {
-      const data = { id: 'user_state', exp, streak, last_active, updated_at: new Date().toISOString() };
-      // Kita pakai 'update' kalau ID 'user_state' sudah ada, tapi untuk simpel kita append terus saja
-      // di sheet 'gameState' agar ada history-nya (fetchGameState ambil yang terbaru).
+      const data = { 
+        id: 'user_state', 
+        exp, 
+        streak, 
+        last_active, 
+        settings_json: settings ? JSON.stringify(settings) : '',
+        updated_at: new Date().toISOString() 
+      };
       await sheetsWrite('insert', 'gameState', data);
     } catch (e) {
       console.warn('[Sheets] updateGameState failed:', e);

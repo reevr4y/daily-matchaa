@@ -98,7 +98,18 @@ body {
   transition: background-color 0.5s ease, color 0.5s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  
+  /* 👋 Custom Machii Cursor - NUCLEAR FIX (Base64 + Universal Important) */
+  cursor: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cGF0aCBkPSJNMTYgMjZDMjEuNSAyNiAyNiAyMS41IDI2IDE2QzI2IDEwLjUgMjEuNSA2IDE2IDZDMTAuNSA2IDYgMTAuNSA2IDE2QzYgMjEuNSAxMC41IDI2IDE2IDI2WiIgZmlsbD0iI0ZGQjdDNSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iMyIgZmlsbD0iI0ZGQjdDNSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjciIHI9IjMiIGZpbGw9IiNGRkI3QzUiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPGNpcmNsZSBjeD0iMjIiIGN5PSIxMCIgcj0iMyIgZmlsbD0iI0ZGQjdDNSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KPC9zdmc+") 0 0, auto !important;
 }
+
+/* Force cursor on everything else through selectors */
+*, html, body, #root, a, button, [role="button"], input, select, textarea {
+  cursor: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cGF0aCBkPSJNMTYgMjZDMjEuNSAyNiAyNiAyMS41IDI2IDE2QzI2IDEwLjUgMjEuNSA2IDE2IDZDMTAuNSA2IDYgMTAuNSA2IDE2QzYgMjEuNSAxMC41IDI2IDE2IDI2WiIgZmlsbD0iI0ZGQjdDNSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iMyIgZmlsbD0iI0ZGQjdDNSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjciIHI9IjMiIGZpbGw9IiNGRkI3QzUiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPGNpcmNsZSBjeD0iMjIiIGN5PSIxMCIgcj0iMyIgZmlsbD0iI0ZGQjdDNSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KPC9zdmc+") 0 0, auto !important;
+}
+
+/* Ensure interactive elements also use the custom cursor or a pointer version if available */
+/* Interactive defaults override already handled above by universal selector */
 
 /* ─── Card ─── */
 .card {
@@ -1811,36 +1822,39 @@ body {
 }
 
 .machii-sprite.idle {
-  background-image: url('/assets/machii_idle.png');
-  background-size: 400% 100%;
-  animation: spriteIdle 1s steps(4) infinite;
+  width: 100px;
+  height: 100px;
+  background-image: url('/assets/machii_diem.gif');
+  background-size: contain;
+  background-position: center bottom;
 }
 
+.dark .machii-sprite.idle {
+  background-image: url('/assets/machii_tidur.gif');
+}
+
+
 .machii-sprite.walk {
-  background-image: url('/assets/machii_walk.png');
-  background-size: 600% 100%;
-  animation: spriteWalk 0.8s steps(6) infinite;
+  width: 100px; 
+  height: 100px;
+  background-image: url('/assets/machii_jalan.gif');
+  background-size: contain;
+  background-position: center bottom;
 }
 
 .machii-sprite.happy {
+  width: 146px; /* Inset from 150px */
+  height: 119px;
   background-image: url('/assets/machii_happy.png');
-  background-size: 400% 100%;
+  background-size: 600px 119px;
   animation: spriteHappy 0.6s steps(4) infinite;
 }
 
-@keyframes spriteIdle {
-  from { background-position-x: 0%; }
-  to { background-position-x: 133.3333%; }
-}
-
-@keyframes spriteWalk {
-  from { background-position-x: 0%; }
-  to { background-position-x: 120%; }
-}
+/* (spriteAnimations replaced by GIFs) */
 
 @keyframes spriteHappy {
-  from { background-position-x: 0%; }
-  to { background-position-x: 133.3333%; }
+  from { background-position-x: -2px; }
+  to { background-position-x: -602px; }
 }
 
 .machii-name-tag {
@@ -1990,5 +2004,20 @@ body {
 
 .machii-name-tag {
   opacity: 1 !important;
+}
+
+@keyframes trail-float {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--tx)), calc(-50% - var(--ty))) scale(0.5) rotate(45deg);
+  }
+}
+
+.animate-trail-float {
+  animation: trail-float 1.5s forwards ease-out;
 }
 

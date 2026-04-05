@@ -55,8 +55,12 @@ export default function SettingsModal({ settings, setSettings, onClose, onToast 
             </label>
             <input 
               type="number"
-              value={localSettings.daily}
-              onChange={e => setLocalSettings({...localSettings, daily: Number(e.target.value)})}
+              min="0"
+              value={localSettings.daily || 0}
+              onChange={e => {
+                const v = parseInt(e.target.value) || 0;
+                setLocalSettings({...localSettings, daily: Math.max(0, v)});
+              }}
               className="input-field"
               placeholder="100000"
             />
@@ -68,8 +72,12 @@ export default function SettingsModal({ settings, setSettings, onClose, onToast 
             </label>
             <input 
               type="number"
-              value={localSettings.weekly}
-              onChange={e => setLocalSettings({...localSettings, weekly: Number(e.target.value)})}
+              min="0"
+              value={localSettings.weekly || 0}
+              onChange={e => {
+                const v = parseInt(e.target.value) || 0;
+                setLocalSettings({...localSettings, weekly: Math.max(0, v)});
+              }}
               className="input-field"
               placeholder="700000"
             />
@@ -81,8 +89,12 @@ export default function SettingsModal({ settings, setSettings, onClose, onToast 
             </label>
             <input 
               type="number"
-              value={localSettings.monthly}
-              onChange={e => setLocalSettings({...localSettings, monthly: Number(e.target.value)})}
+              min="0"
+              value={localSettings.monthly || 0}
+              onChange={e => {
+                const v = parseInt(e.target.value) || 0;
+                setLocalSettings({...localSettings, monthly: Math.max(0, v)});
+              }}
               className="input-field"
               placeholder="2000000"
             />

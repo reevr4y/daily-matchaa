@@ -185,7 +185,7 @@ export default function HistoryModal({ tasks, expenses, onClose }) {
               <div className="history-section">
                 <div className="history-section-title">
                   <span>📸</span>
-                  <span>Pap Harian</span>
+                  <span>Absen Cantik</span>
                   <span
                     className="ml-auto text-xs font-semibold px-2 py-0.5 rounded-full"
                     style={{ background: 'rgba(123,174,127,0.15)', color: 'var(--success)' }}
@@ -197,7 +197,7 @@ export default function HistoryModal({ tasks, expenses, onClose }) {
                   <div className="history-pap-photo">
                     <img
                       src={papRecord.photo_url}
-                      alt={`pap ${selectedDate}`}
+                      alt={`absen ${selectedDate}`}
                       onError={e => { e.target.parentElement.innerHTML = '<div class="history-pap-fallback">📷 Foto tidak bisa dimuat</div>'; }}
                     />
                   </div>
@@ -299,7 +299,7 @@ export default function HistoryModal({ tasks, expenses, onClose }) {
                 )}
                 {papRecord && (
                   <div className="history-chip chip-green">
-                    📸 Pap done!
+                    📸 Absen done!
                   </div>
                 )}
               </div>

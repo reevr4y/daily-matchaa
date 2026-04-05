@@ -4,21 +4,21 @@ import { fireConfetti } from '../utils/confetti';
 
 const STORAGE_KEY = 'dlt_daily_pap';
 
-// ── Pesan lucu waktu belum pap ────────────────────────────────────────────────
+// ── Pesan lucu waktu belum absen ───────────────────────────────────────────
 const IDLE_MESSAGES = [
   {
-    text: 'Hei cantik, belom pap nih 😤',
+    text: 'Hei cantik, belom absen nih 😤',
     sub:  'Yuk foto dulu, aku pengen lihat wajah kamu!',
     emoji: '🥺',
   },
   {
-    text: 'Mana foto cantiknya? 👀',
-    sub:  'Streak bahaya kalau ga foto hari ini...',
+    text: 'Mana absen cantiknya? 👀',
+    sub:  'Streak bahaya kalau ga absen hari ini...',
     emoji: '😍',
   },
   {
     text: 'Kangen liat mukamu 🥺',
-    sub:  'Pap sebentar dong, baru deh rebahan~',
+    sub:  'Absen sebentar dong, baru deh rebahan~',
     emoji: '💕',
   },
   {
@@ -27,33 +27,33 @@ const IDLE_MESSAGES = [
     emoji: '😏',
   },
   {
-    text: 'Eh kamu lupa pap ya? 🤨',
+    text: 'Eh kamu lupa absen ya? 🤨',
     sub:  'Jangan dong, aku pengen lihat kamu tiap hari!',
     emoji: '🤨',
   },
   {
-    text: 'Pap sekarang! Aku nunggu foto kamu 📣',
+    text: 'Absen sekarang! Aku nunggu foto kamu 📣',
     sub:  'Pasti cantik banget deh hari ini, buktiin!',
     emoji: '📣',
   },
   {
-    text: 'Belum foto nih~ ayo dong 🙃',
+    text: 'Belum absen nih~ ayo dong 🙃',
     sub:  'Masih ada waktu! Aku mau lihat senyumu hari ini~',
     emoji: '🙃',
   },
   {
-    text: 'Foto dulu ya sayang 💖',
+    text: 'Absen dulu ya sayang 💖',
     sub:  'Tiap hari aku nunggu foto kamu loh~',
     emoji: '💖',
   },
 ];
 
-// ── Pesan sukses habis pap ────────────────────────────────────────────────────
+// ── Pesan sukses habis absen ──────────────────────────────────────────────────
 const DONE_MESSAGES = [
   { text: 'Cantik banget sih kamu hari ini! 😍',     sub: 'Makin hari makin cakep deh~ +15 EXP!' },
   { text: 'Makin cantik aja tiap hari 💕',            sub: 'Beneran deh, foto ini bikin senyum terus~' },
   { text: 'Aduh, cantiknya keterlaluan 😭✨',          sub: 'Streak aman, hati aku makin klepek-klepek!' },
-  { text: 'Cantiknya konsisten, persis kayak streak-nya 🔥', sub: 'Makasih udah pap hari ini, aku suka banget~' },
+  { text: 'Cantiknya konsisten, persis kayak streak-nya 🔥', sub: 'Makasih udah absen hari ini, aku suka banget~' },
   { text: 'Kamu makin glowing setiap harinya 🌟',     sub: 'Semangat terus ya! +15 EXP udah di kantong~' },
   { text: 'Foto setiap hari karena emang selalu cakep 💖', sub: 'Gatau deh kok bisa secantik itu tiap hari~' },
   { text: 'Aduhai, cantik banget sih! 🥰',            sub: 'Aku lucky banget bisa lihat foto kamu tiap hari!' },
@@ -162,9 +162,9 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
     if (onShowExpPopup) onShowExpPopup(15, 'exp');
     
     if (photo_url) {
-      onToast('Pap berhasil! Foto tersimpan di Drive ☁️ +15 EXP 📸✨', 'success');
+      onToast('Absen berhasil! Foto tersimpan di Drive ☁️ +15 EXP 📸✨', 'success');
     } else {
-      onToast('Pap tercatat! Tapi foto gagal simpan di Drive (cek console) ⚠️ +15 EXP', 'warn');
+      onToast('Absen tercatat! Tapi foto gagal simpan di Drive (cek console) ⚠️ +15 EXP', 'warn');
     }
 
     // ── Catat streak ke Sheets juga ───────────────────────────────────────────
@@ -237,11 +237,11 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
   };
 
   const handleReset = () => {
-    if (window.confirm('Hapus status Pap hari ini dari HP ini saja? (Bisa sinkron ulang lho!)')) {
+    if (window.confirm('Hapus status Absen hari ini dari HP ini saja? (Bisa sinkron ulang lho!)')) {
       localStorage.removeItem(STORAGE_KEY);
       setPapState(null);
       setPreview(null);
-      onToast('Status Pap di-reset! Silakan upload baru atau tunggu sinkron otomatis 🔄', 'info');
+      onToast('Status Absen di-reset! Silakan upload baru atau tunggu sinkron otomatis 🔄', 'info');
       // Beri jeda kecil lalu paksa cek ulang sync
       setTimeout(() => window.location.reload(), 800);
     }
@@ -267,7 +267,7 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
       {/* ── Header ── */}
       <div className="section-title mb-3">
         <span>📸</span>
-        <span>Kirim Pap Harian</span>
+        <span>Absen Cantik Hari Ini</span>
         <div className="ml-auto flex items-center gap-1.5">
           <span
             className="text-[10px] font-bold px-2 py-0.5 rounded-full opacity-60"
@@ -282,7 +282,7 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
               color: '#fff',
             }}
           >
-            {isDone ? '✅ Done!' : '⚠️ Wajib Pap'}
+            {isDone ? '✅ Done!' : '⚠️ Wajib Absen'}
           </span>
         </div>
       </div>
@@ -318,8 +318,8 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
             <span className="text-base">🔥</span>
             <span>
               {streak && streak > 0
-                ? `Streak kamu ${streak} hari! Jangan sampe putus gara-gara ga pap~`
-                : 'Mulai streak baru hari ini dengan pap! 🚀'}
+                ? `Streak kamu ${streak} hari! Jangan sampe putus gara-gara ga absen~`
+                : 'Mulai streak baru hari ini dengan absen! 🚀'}
             </span>
           </div>
 
@@ -384,7 +384,7 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
                 disabled={uploading}
                 className="flex-1 btn-primary py-2.5 rounded-2xl flex items-center justify-center gap-1.5 font-bold"
               >
-                {uploading ? '⏳ Uploading...' : '✅ Kirim Pap! (+15 EXP)'}
+                {uploading ? '⏳ Uploading...' : '✅ Setor Muka (+15 EXP)'}
               </button>
             </div>
           )}
@@ -423,7 +423,7 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
               className="mt-3 text-[10px] uppercase tracking-wider font-bold opacity-40 hover:opacity-100 transition-opacity"
               style={{ color: 'var(--muted)' }}
             >
-              🔄 Ulangi / Reset Pap Hari Ini
+              🔄 Ulangi / Reset Absen Hari Ini
             </button>
           </div>
 
@@ -441,7 +441,7 @@ export default function DailyPhotoTask({ onExp, onToast, onAddPap, onSaveStreak,
             >
               <img
                 src={savedPhotoUrl}
-                alt="pap hari ini"
+                alt="absen hari ini"
                 style={{
                   width:      '100%',
                   height:     '100%',
