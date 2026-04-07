@@ -32,9 +32,9 @@ const CHARACTER_CONFIG = {
     id: 'human',
     name: 'Machii (Human)',
     actions: {
-      idle: { type: 'video', src: `${BASE}assets/machii_game.mp4`, size: 100 },
-      walk: { type: 'video', src: `${BASE}assets/machii_gerak.mp4`, size: 100 },
-      interact: { type: 'video', src: `${BASE}assets/machii_hai.mp4`, size: 100 }
+      idle: { type: 'gif', src: `${BASE}assets/machii_game.gif`, size: 100 },
+      walk: { type: 'gif', src: `${BASE}assets/machii_gerak.gif`, size: 100 },
+      interact: { type: 'gif', src: `${BASE}assets/machii_hai.gif`, size: 100 }
     }
   }
 };
