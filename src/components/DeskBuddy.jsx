@@ -18,14 +18,7 @@ const CHARACTER_CONFIG = {
     actions: {
       idle: { type: 'gif', src: `${BASE}assets/machii_diem.gif`, size: 100 },
       walk: { type: 'gif', src: `${BASE}assets/machii_jalan.gif`, size: 100 },
-      interact: { 
-        type: 'sprite', 
-        src: `${BASE}assets/machii_happy.png`, 
-        sizeY: 119, 
-        sizeX: 146, 
-        frames: 4, 
-        duration: '0.6s' 
-      }
+      interact: { type: 'gif', src: `${BASE}assets/machii_happy.gif`, size: 100 }
     }
   },
   human: {
