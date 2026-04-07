@@ -32,9 +32,9 @@ const CHARACTER_CONFIG = {
     id: 'human',
     name: 'Machii (Human)',
     actions: {
-      idle: { type: 'gif', src: `${BASE}assets/machii_game.gif`, size: 100 },
-      walk: { type: 'gif', src: `${BASE}assets/machii_gerak.gif`, size: 100 },
-      interact: { type: 'gif', src: `${BASE}assets/machii_hai.gif`, size: 100 }
+      idle: { type: 'video', src: `${BASE}assets/machii_game.mp4`, size: 100 },
+      walk: { type: 'video', src: `${BASE}assets/machii_gerak.mp4`, size: 100 },
+      interact: { type: 'video', src: `${BASE}assets/machii_hai.mp4`, size: 100 }
     }
   }
 };
@@ -194,20 +194,42 @@ export default function DeskBuddy({ tasksCompletedToday = 0, darkMode = false, c
                 <span className="machii-name-text">{currentConfig.name}</span>
               </div>
 
-              {/* ── Dynamic Sprite ── */}
-              <div 
-                className={`machii-sprite dynamic filter drop-shadow-md cursor-pointer transition-all duration-300 ${currentAction === 'interact' ? 'scale-110' : ''}`} 
-                style={{ 
+              {/* ── Dynamic Sprite / Video ── */}
+              {actionConfig.type === 'video' ? (
+                <video
+                  key={`${currentCharacter}-${currentAction}`}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className={`machii-sprite dynamic filter drop-shadow-md cursor-pointer transition-all duration-300 ${currentAction === 'interact' ? 'scale-110' : ''}`}
+                  style={{
                     transform: `translate(${lookAt.x}px, ${lookAt.y}px)`,
-                    backgroundImage: `url(${actionConfig.src})`,
-                    width: actionConfig.sizeX || actionConfig.size || 100,
-                    height: actionConfig.sizeY || actionConfig.size || 100,
-                    backgroundSize: actionConfig.type === 'sprite' ? `${(actionConfig.sizeX || 100) * actionConfig.frames}px ${actionConfig.sizeY || 100}px` : 'contain',
-                    backgroundPosition: 'center bottom',
-                    animation: actionConfig.type === 'sprite' ? `sprite${currentAction} ${actionConfig.duration} steps(${actionConfig.frames}) infinite` : 'none'
-                }}
-                onClick={() => triggerInteract(true)}
-              />
+                    width: actionConfig.size || 100,
+                    height: actionConfig.size || 100,
+                    objectFit: 'contain',
+                    // Optional: common trick for black-background transparency if needed
+                    // mixBlendMode: 'screen' 
+                  }}
+                  onClick={() => triggerInteract(true)}
+                >
+                  <source src={actionConfig.src} type="video/mp4" />
+                </video>
+              ) : (
+                <div 
+                  className={`machii-sprite dynamic filter drop-shadow-md cursor-pointer transition-all duration-300 ${currentAction === 'interact' ? 'scale-110' : ''}`} 
+                  style={{ 
+                      transform: `translate(${lookAt.x}px, ${lookAt.y}px)`,
+                      backgroundImage: `url(${actionConfig.src})`,
+                      width: actionConfig.sizeX || actionConfig.size || 100,
+                      height: actionConfig.sizeY || actionConfig.size || 100,
+                      backgroundSize: actionConfig.type === 'sprite' ? `${(actionConfig.sizeX || 100) * actionConfig.frames}px ${actionConfig.sizeY || 100}px` : 'contain',
+                      backgroundPosition: 'center bottom',
+                      animation: actionConfig.type === 'sprite' ? `sprite${currentAction} ${actionConfig.duration} steps(${actionConfig.frames}) infinite` : 'none'
+                  }}
+                  onClick={() => triggerInteract(true)}
+                />
+              )}
           </div>
       </div>
       
