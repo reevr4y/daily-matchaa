@@ -678,13 +678,16 @@ export default function App() {
       <div className="action-dock-item character-dock">
         <button
           onClick={handleSwitchCharacter}
-          className="dock-btn"
+          className="dock-btn group"
           aria-label="Switch Character"
-          title={`Switch to ${currentCharacter === 'cat' ? 'Human' : 'Cat'}`}
+          title={`Magically transform to ${currentCharacter === 'cat' ? 'Human' : 'Cat'} ✨`}
         >
-          <span className="hover:rotate-12 transition-transform duration-300">
-            {currentCharacter === 'cat' ? '👤' : '🐱'}
-          </span>
+          <div className="relative flex items-center justify-center">
+            <span className="text-sm absolute -top-4 -right-4 animate-pulse">✨</span>
+            <span className="group-hover:rotate-[20deg] group-hover:scale-110 transition-transform duration-500 text-2xl">
+              {currentCharacter === 'cat' ? '🪄' : '🎀'}
+            </span>
+          </div>
         </button>
       </div>
     </div>

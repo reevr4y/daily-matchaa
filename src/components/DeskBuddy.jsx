@@ -14,7 +14,7 @@ const BASE = import.meta.env.BASE_URL || '/';
 const CHARACTER_CONFIG = {
   cat: {
     id: 'cat',
-    name: 'Machii (Cat)',
+    name: 'Machii',
     actions: {
       idle: { type: 'gif', src: `${BASE}assets/machii_diem.gif`, size: 100 },
       walk: { type: 'gif', src: `${BASE}assets/machii_jalan.gif`, size: 100 },
@@ -30,7 +30,7 @@ const CHARACTER_CONFIG = {
   },
   human: {
     id: 'human',
-    name: 'Machii (Human)',
+    name: 'Machii',
     actions: {
       idle: { type: 'gif', src: `${BASE}assets/machii_game.gif`, size: 100 },
       walk: { type: 'gif', src: `${BASE}assets/machii_gerak.gif`, size: 100 },
