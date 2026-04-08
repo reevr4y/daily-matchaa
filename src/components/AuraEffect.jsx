@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
-export default function AuraEffect({ level = 1 }) {
+const AuraEffect = React.memo(function AuraEffect({ level = 1 }) {
   const [active, setActive] = useState(false);
 
   // Trigger brief pulse when level changes
@@ -22,4 +22,7 @@ export default function AuraEffect({ level = 1 }) {
       <div className={`aura-glow ${auraClass}`} />
     </div>
   );
-}
+});
+
+export default AuraEffect;
+

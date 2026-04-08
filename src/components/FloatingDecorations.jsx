@@ -1,3 +1,5 @@
+import React from 'react';
+
 const THEME_ICONS = {
   matcha:     ['🍃', '🌿', '🍵', '🍃', '🌱', '☘️'],
   strawberry: ['🍓', '🌸', '💖', '🍨', '🌷', '🎀'],
@@ -5,7 +7,7 @@ const THEME_ICONS = {
   lavender:   ['🍇', '🪻', '💜', '🌙', '🔮', '💤'],
 };
 
-export default function FloatingDecorations({ theme = 'matcha' }) {
+const FloatingDecorations = React.memo(function FloatingDecorations({ theme = 'matcha' }) {
   const icons = THEME_ICONS[theme] || THEME_ICONS.matcha;
 
   return (
@@ -20,4 +22,7 @@ export default function FloatingDecorations({ theme = 'matcha' }) {
       ))}
     </div>
   );
-}
+});
+
+export default FloatingDecorations;
+

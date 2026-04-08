@@ -4,8 +4,12 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: './',
+  base: '/daily-life-tracker/',
   
+  esbuild: {
+    drop: ['console', 'debugger']
+  },
+
   build: {
     // ✅ Code splitting for faster initial load
     rollupOptions: {
@@ -15,22 +19,17 @@ export default defineConfig({
             if (id.includes('react') || id.includes('react-dom') || id.includes('scheduler')) {
               return 'vendor-react';
             }
+            if (id.includes('framer-motion')) {
+              return 'vendor-motion';
+            }
             return 'vendor';
           }
         }
       }
     },
     
-    // ✅ Minification with Terser
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // Remove console.logs in production
-        drop_debugger: true
-      }
-    },
-    
-    // ✅ Increase chunk size warning limit
+    // ✅ Build-time optimizations
+    minify: 'esbuild',
     chunkSizeWarningLimit: 1000
   },
   

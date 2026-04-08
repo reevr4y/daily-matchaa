@@ -50,27 +50,30 @@ export function playChime() {
   } catch (e) {}
 }
 
+let _meow = null, _machii = null;
+
 export function playMeow() {
   try {
-    const audioPath = import.meta.env.BASE_URL + 'assets/meow.mp3';
-    const audio = new Audio(audioPath);
-    audio.volume = 0.5;
-    audio.play().catch(e => console.warn("Meow blocked:", e));
-  } catch (e) {
-    console.error(e);
-  }
+    if (!_meow) { 
+      _meow = new Audio(import.meta.env.BASE_URL + 'assets/meow.mp3'); 
+      _meow.volume = 0.5; 
+    }
+    _meow.currentTime = 0;
+    _meow.play().catch(e => console.warn("Meow blocked:", e));
+  } catch(e) {}
 }
 
 export function playMachiiSuara() {
   try {
-    const audioPath = import.meta.env.BASE_URL + 'assets/machii_suara.mp3';
-    const audio = new Audio(audioPath);
-    audio.volume = 0.5;
-    audio.play().catch(e => console.warn("Machii suara blocked:", e));
-  } catch (e) {
-    console.error(e);
-  }
+    if (!_machii) { 
+      _machii = new Audio(import.meta.env.BASE_URL + 'assets/machii_suara.mp3'); 
+      _machii.volume = 0.5; 
+    }
+    _machii.currentTime = 0;
+    _machii.play().catch(e => console.warn("Machii suara blocked:", e));
+  } catch(e) {}
 }
+
 
 export function playRandomEmoteSound() {
   try {

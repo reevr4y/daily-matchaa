@@ -8,7 +8,7 @@ const THEME_AURORA_COLORS = {
 };
 
 
-export default function SkyEffects({ theme = 'matcha' }) {
+const SkyEffects = React.memo(function SkyEffects({ theme = 'matcha' }) {
   const colors = THEME_AURORA_COLORS[theme] || THEME_AURORA_COLORS.matcha;
 
   // Generate 5 random star positions/timings one-time
@@ -75,4 +75,7 @@ export default function SkyEffects({ theme = 'matcha' }) {
       </div>
     </div>
   );
-}
+});
+
+export default SkyEffects;
+

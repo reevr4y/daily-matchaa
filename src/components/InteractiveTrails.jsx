@@ -1,47 +1,55 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useMousePosition } from '../hooks/useMousePosition';
+
 
 const PARTICLE_LIFETIME = 1500;
 const MAX_PARTICLES = 15;
 
-export default function InteractiveTrails() {
+const InteractiveTrails = React.memo(function InteractiveTrails() {
   const [particles, setParticles] = useState([]);
   const lastPos = useRef({ x: 0, y: 0 });
 
+  const handleMove = (x, y) => {
+    if (!x || !y) return;
+
+    // Only spawn if moved enough to avoid overcrowding
+    const dist = Math.sqrt(Math.pow(x - lastPos.current.x, 2) + Math.pow(y - lastPos.current.y, 2));
+    
+    if (dist > 30) {
+      lastPos.current = { x, y };
+      const id = Math.random().toString(36).substring(2, 9);
+      const type = Math.random() > 0.5 ? 'leaf' : 'flower';
+      const size = Math.random() * 15 + 10;
+      const rotation = Math.random() * 360;
+
+      const newParticle = { id, x, y, type, size, rotation, birth: Date.now() };
+
+      setParticles(prev => {
+         const updated = [...prev, newParticle];
+         if (updated.length > MAX_PARTICLES) return updated.slice(1);
+         return updated;
+      });
+
+      setTimeout(() => {
+        setParticles(prev => prev.filter(p => p.id !== id));
+      }, PARTICLE_LIFETIME);
+    }
+  };
+
+  useMousePosition(handleMove);
+
   useEffect(() => {
-    const handleMove = (e) => {
-      const x = e.clientX || (e.touches && e.touches[0].clientX);
-      const y = e.clientY || (e.touches && e.touches[0].clientY);
-      
-      if (!x || !y) return;
-
-      // Only spawn if moved enough to avoid overcrowding
-      const dist = Math.sqrt(Math.pow(x - lastPos.current.x, 2) + Math.pow(y - lastPos.current.y, 2));
-      
-      if (dist > 30) {
-        lastPos.current = { x, y };
-        const id = Math.random().toString(36).substring(2, 9);
-        const type = Math.random() > 0.5 ? 'leaf' : 'flower';
-        const size = Math.random() * 15 + 10;
-        const rotation = Math.random() * 360;
-
-        const newParticle = { id, x, y, type, size, rotation, birth: Date.now() };
-
-        setParticles(prev => {
-           const updated = [...prev, newParticle];
-           if (updated.length > MAX_PARTICLES) return updated.slice(1);
-           return updated;
-        });
-
-        setTimeout(() => {
-          setParticles(prev => prev.filter(p => p.id !== id));
-        }, PARTICLE_LIFETIME);
-      }
-    };
-
-    window.addEventListener('mousemove', handleMove);
+    // Keep touchmove for mobile if needed, but the hook only does mousemove.
+    // However the prompt says "Ganti dengan memanggil useMousePosition(handleMove) di dalam komponen."
+    // and "Hapus window.addEventListener('mousemove', handleMove) dan window.removeEventListener-nya."
+    // It doesn't explicitly say to remove touchmove, but singleton pattern usually benefits from both.
+    // For now I'll follow instructions strictly and only replace mousemove if that's what's implied.
+    // Actually, usually useMousePosition should handle both if it's a "mouse/touch position" hook,
+    // but the user's implementation of useMousePosition only has mousemove.
+    // I'll stick to the provided code for the hook.
+    
     window.addEventListener('touchmove', handleMove);
     return () => {
-      window.removeEventListener('mousemove', handleMove);
       window.removeEventListener('touchmove', handleMove);
     };
   }, []);
@@ -74,4 +82,6 @@ export default function InteractiveTrails() {
       ))}
     </div>
   );
-}
+});
+
+export default InteractiveTrails;

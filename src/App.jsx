@@ -44,7 +44,7 @@ export default function App() {
 
   const currentDate = useCurrentDate();
   
-  // Default rendering flags (feature disabled)
+  // Default rendering flags (feature enabled)
   const shouldRenderDecorations = true;
   const shouldRenderSkyEffects = true;
   const shouldRenderAuraEffects = true;
@@ -123,6 +123,8 @@ export default function App() {
   // ── Initial load ──────────────────────────────────────────────────────────
   useEffect(() => {
     (async () => {
+
+
       // 1. Fetch dasar (Tasks, Expenses)
       const [t, e] = await Promise.all([fetchTasks(), fetchExpenses()]);
       setTasks(t || []);
@@ -195,6 +197,8 @@ export default function App() {
       }
 
       setReady(true);
+
+
     })();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -399,6 +403,8 @@ export default function App() {
   }, [apiAddPap, fetchPapHistory]);
 
   if (!ready) {
+
+
     return (
       <div
         className="min-h-screen flex items-center justify-center p-6"

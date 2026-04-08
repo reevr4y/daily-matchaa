@@ -1,9 +1,9 @@
-import { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { playRandomEmoteSound } from '../utils/sounds';
 
 const EMOTES = ['💖', '😆', '🎉', '😺', '✨', '💅', '😭', '🔥', '🌈', '🦄'];
 
-export default function EmoteReaction({ onAddExp }) {
+const EmoteReaction = React.memo(function EmoteReaction({ onAddExp }) {
   const [activeEmotes, setActiveEmotes] = useState([]);
   const lastClickRef = useRef(0);
 
@@ -67,4 +67,7 @@ export default function EmoteReaction({ onAddExp }) {
       </button>
     </div>
   );
-}
+});
+
+export default EmoteReaction;
+

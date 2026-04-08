@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useMousePosition } from '../hooks/useMousePosition';
 import { playMeow, playMachiiSuara } from '../utils/sounds';
 
 const MESSAGES = [
@@ -11,19 +12,6 @@ const MESSAGES = [
 
 const BASE = import.meta.env.BASE_URL || '/';
 
-/**
- * Throttle helper function
- * Limits function calls to once per specified delay
- */
-function throttle(func, delay) {
-  let lastCall = 0;
-  return function(...args) {
-    const now = Date.now();
-    if (now - lastCall < delay) return;
-    lastCall = now;
-    func(...args);
-  };
-}
 
 const CHARACTER_CONFIG = {
   cat: {
@@ -70,17 +58,10 @@ export default function DeskBuddy({ tasksCompletedToday = 0, darkMode = false, c
     }
   }, [tasksCompletedToday]);
 
-  // ✅ OPTIMIZED: Mouse tracking with throttle + RAF
+  // ✅ OPTIMIZED: Mouse tracking with singleton hook + RAF pause
   useEffect(() => {
     let mouseX = 0;
     let mouseY = 0;
-    
-    // Throttled mouse position capture (max 30fps)
-    const handleMouseMove = throttle((e) => {
-      if (isWalkingRef.current) return;
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    }, 33); // ~30fps throttle
     
     // Smooth eye updates via RAF
     const updateEyes = () => {
@@ -109,13 +90,28 @@ export default function DeskBuddy({ tasksCompletedToday = 0, darkMode = false, c
       
       rafRef.current = requestAnimationFrame(updateEyes);
     };
+
+    // Use singleton hook for global mouse tracking
+    useMousePosition((x, y) => {
+      if (isWalkingRef.current) return;
+      mouseX = x;
+      mouseY = y;
+    });
     
-    // ✅ Passive listener for better scroll performance
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    const handleVisibility = () => {
+      if (document.hidden) {
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      } else {
+        if (!rafRef.current) rafRef.current = requestAnimationFrame(updateEyes);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
     rafRef.current = requestAnimationFrame(updateEyes);
     
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('visibilitychange', handleVisibility);
       if (rafRef.current) {
         cancelAnimationFrame(rafRef.current);
       }
