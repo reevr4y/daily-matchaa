@@ -27,8 +27,8 @@ import EmoteReaction from './components/EmoteReaction';
 import StickerManager from './components/StickerManager';
 
 // Lazy load decorative components
-const SkyEffects = lazy(() => import('./components/SkyEffects'));
-const FloatingDecorations = lazy(() => import('./components/FloatingDecorations'));
+import SkyEffects from './components/SkyEffects';
+import FloatingDecorations from './components/FloatingDecorations';
 
 
 export default function App() {
@@ -196,6 +196,7 @@ export default function App() {
         console.warn('[PAP History] Failed to fetch full history:', e);
       }
 
+      console.log('[App] Initial load complete. Setting ready to true.');
       setReady(true);
 
 
@@ -402,9 +403,10 @@ export default function App() {
     return record;
   }, [apiAddPap, fetchPapHistory]);
 
+  console.log('[App] Rendering. Ready:', ready, 'Theme:', theme, 'EXP:', exp);
+
   if (!ready) {
-
-
+    console.log('[App] Rendering loading screen...');
     return (
       <div
         className="min-h-screen flex items-center justify-center p-6"
@@ -440,22 +442,15 @@ export default function App() {
     );
   }
 
+  console.log('[App] Rendering main UI...');
   return (
     <div
       className="min-h-screen"
       style={{ background: 'var(--bg)', transition: 'background 0.3s ease', position: 'relative', overflow: 'hidden' }}
     >
       {/* ── Decorative elements ── */}
-      {shouldRenderSkyEffects && (
-        <Suspense fallback={null}>
-          <SkyEffects theme={theme} />
-        </Suspense>
-      )}
-      {shouldRenderDecorations && (
-        <Suspense fallback={null}>
-          <FloatingDecorations theme={theme} />
-        </Suspense>
-      )}
+      {shouldRenderSkyEffects && <SkyEffects theme={theme} />}
+      {shouldRenderDecorations && <FloatingDecorations theme={theme} />}
 
       <div className="deco-blob deco-blob-1" aria-hidden="true" />
       <div className="deco-blob deco-blob-2" aria-hidden="true" />
