@@ -3,11 +3,13 @@ import { useMousePosition } from '../hooks/useMousePosition';
 import { playMeow, playMachiiSuara } from '../utils/sounds';
 
 const MESSAGES = [
-  "Hallo Matchaaww 😆💖",
-  "Matchaaww lagi ngapain nih? 👀",
-  "Semangat ya hari ini Matchaaww 💪✨",
-  "Jangan lupa makan yaa 🍽️",
-  "Machii kangen Matchaaww 😽"
+  "Hi, sayang! Hari ini kamu hebat 💙",
+  "Jangan lupa makan dan minum yaa matchaaww~ 💕",
+  "Aku bangga banget sama progres kamu hari ini! 🥺✨",
+  "Lagi capek ya? Peluk jauh dari sini 🤗💖",
+  "Ingat ya, istirahat itu juga bagian dari produktivitas 💤🌸",
+  "Kamu itu sumber kebahagiaan aku, tau gak? 🥹💓",
+  "Apapun yang terjadi hari ini, kamu tetap yang terbaik! 👑✨"
 ];
 
 const BASE = import.meta.env.BASE_URL || '/';
@@ -216,9 +218,18 @@ export default function DeskBuddy({ tasksCompletedToday = 0, darkMode = false, c
   }
 
   return (
-    <div 
+    <motion.div 
       ref={containerRef}
-      className="flex flex-col items-center pointer-events-auto relative z-[100] mt-4 mb-2 md:mt-8 md:mb-4 transition-all duration-300 scale-90 md:scale-100"
+      initial={{ y: 0 }}
+      animate={{ 
+        y: [0, -15, 0],
+      }}
+      transition={{
+        duration: 4,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }}
+      className="flex flex-col items-center pointer-events-auto relative z-[100] mt-4 mb-2 md:mt-8 md:mb-4 transition-all duration-300 scale-100 md:scale-125"
     >
       
       {/* --- Translate Container --- */}
@@ -293,6 +304,6 @@ export default function DeskBuddy({ tasksCompletedToday = 0, darkMode = false, c
           to { background-position-x: -${(actionConfig.sizeX || 100) * (actionConfig.frames || 1)}px; }
         }
       `}</style>
-    </div>
+    </motion.div>
   );
 }

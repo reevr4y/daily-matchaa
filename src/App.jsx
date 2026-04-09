@@ -26,10 +26,12 @@ import InteractiveTrails from './components/InteractiveTrails';
 import EmoteReaction from './components/EmoteReaction';
 import StickerManager from './components/StickerManager';
 import ScrollReveal from './components/ScrollReveal';
+import SparkleBurst from './components/ui/SparkleBurst';
 
 // Lazy load decorative components
 import SkyEffects from './components/SkyEffects';
 import FloatingDecorations from './components/FloatingDecorations';
+import DecorativeBackground from './components/ui/DecorativeBackground';
 
 
 export default function App() {
@@ -76,6 +78,12 @@ export default function App() {
 
   // ── Filter ────────────────────────────────────────────────────────────────
   const [filter, setFilter] = useState('daily');
+
+  // ── Sparkle Burst ────────────────────────────────────────────────────────
+  const [sparkleTrigger, setSparkleTrigger] = useState(null);
+  const triggerSparkle = useCallback((x, y) => {
+    setSparkleTrigger({ id: Date.now(), x, y });
+  }, []);
 
   // ── Game state ────────────────────────────────────────────────────────────
   const { exp, streak, levelInfo, addExp, streakBroke, setExp, setStreak } = useGameState();
@@ -447,12 +455,14 @@ export default function App() {
       {shouldRenderSkyEffects && <SkyEffects theme={theme} />}
       {shouldRenderDecorations && <FloatingDecorations theme={theme} />}
 
-      <div className="deco-blob deco-blob-1" aria-hidden="true" />
-      <div className="deco-blob deco-blob-2" aria-hidden="true" />
-      <div className="deco-blob deco-blob-3" aria-hidden="true" />
-
+      <SparkleBurst trigger={sparkleTrigger} />
+      <DecorativeBackground />
+      {shouldRenderAuraEffects && <AuraEffect />}
+      <InteractiveTrails />
+      <StickerManager stickers={settings.stickers} onUpdate={handleUpdateStickers} />
+      
       {/* ── Container ── */}
-      <div className="app-container">
+      <div className="app-container !max-w-[1240px] !pt-14 !pb-24">
 
         {/* ── Header Row: Greeting/EXP (L) + Date (R) ── */}
         <div className="header-row">
@@ -515,7 +525,7 @@ export default function App() {
         </div>
 
         {/* ── Desk Buddy (Hero Cat) Placement ── */}
-        <div className="flex justify-center z-10 relative pointer-events-none">
+        <div className="flex justify-center z-[100] relative pointer-events-none -mt-4 mb-2 md:-mt-8 md:mb-8">
           <DeskBuddy 
             levelInfo={levelInfo} 
             darkMode={darkMode}
@@ -545,6 +555,7 @@ export default function App() {
                 onComplete={handleCompleteTask}
                 onDelete={handleDeleteTask}
                 onToast={addToast}
+                onSparkle={triggerSparkle}
               />
             </div>
           </ScrollReveal>

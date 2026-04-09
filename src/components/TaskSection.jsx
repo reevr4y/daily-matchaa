@@ -42,13 +42,15 @@ export default memo(function TaskSection({ tasks, filter, onAdd, onComplete, onD
     if (task.date < today) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = rect.left / window.innerWidth;
-    const y = rect.top / window.innerHeight;
-    fireSmallConfetti(x, y);
+    const x = e.clientX;
+    const y = e.clientY;
+    
+    onSparkle?.(x, y);
+    fireSmallConfetti(x / window.innerWidth, y / window.innerHeight);
     playChime();
     onToast('Cie produktif matchaaww 😏✨', 'success');
     onComplete(task.id);
-  }, [onComplete, onToast, today]);
+  }, [onComplete, onToast, onSparkle, today]);
 
   const handleDeleteInternal = useCallback(async (id, isLocked) => {
     if (isLocked) return;

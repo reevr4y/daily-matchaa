@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Nunito:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,22 +6,29 @@
 
 /* â”€â”€â”€ CSS Variables â”€â”€â”€ */
 :root {
-  /* Matcha (Default) */
-  --bg:         #F8F5F0;
-  --card:       #FFFFFF;
-  --accent:     #E6D3B3;
-  --accent-2:   #D6C2A1;
-  --text:       #3E3E3E;
-  --muted:      #8A8A8A;
-  --border:     #EDE8E0;
-  --shadow:     rgba(0, 0, 0, 0.05);
-  --shadow-md:  rgba(0, 0, 0, 0.08);
-  --success:    #7BAE7F;
-  --danger:     #D98080;
-  --exp-fill:   #C4A882;
-  --glass:      rgba(255, 255, 255, 0.7);
-  --glow-green: rgba(123, 174, 127, 0.2);
-  --glow-gold:  rgba(196, 168, 130, 0.25);
+  /* Matcha Premium (Default) - Soft & Airy */
+  --bg:         #FFFDFB;
+  --card:       rgba(255, 255, 255, 0.75);
+  --accent:     #F3F9EF; /* Soft Mint */
+  --accent-2:   #E4F2D9; 
+  --text:       #5D504E; /* Warm Cocoa */
+  --muted:      #9E8E8B;
+  --border:     rgba(228, 242, 217, 0.4);
+  --shadow:     rgba(90, 80, 70, 0.05);
+  --shadow-md:  rgba(90, 80, 70, 0.08);
+  --success:    #A8D5BA; /* Muted Mint */
+  --danger:     #F4B0B0;
+  --exp-fill:   #D6E6C2;
+  --glass:      rgba(255, 255, 255, 0.65);
+  --glow-green: rgba(168, 213, 186, 0.3);
+  --glow-gold:  rgba(214, 230, 194, 0.4);
+  
+  /* Redesign Specs */
+  --soft-blue:  #E1F5FE;
+  --soft-pink:  #FCE4EC;
+  --soft-peach: #FFF3E0;
+  --soft-lavender: #F3E5F5;
+  --premium-radius: 2rem;
 }
 
 /* ðŸ“ Strawberry Theme */
@@ -117,20 +124,23 @@ html, body {
   padding: 0;
   overflow-x: hidden;
   width: 100%;
-  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  font-family: 'Nunito', system-ui, sans-serif;
   background-color: var(--bg);
-  /* Subtle gradient background */
-  background-image: radial-gradient(ellipse at 20% 10%, var(--accent), transparent 55%),
-                    radial-gradient(ellipse at 80% 90%, var(--success), transparent 50%);
+  /* Elegant animated gradient background */
+  background: linear-gradient(-45deg, #FFFDFB, var(--soft-peach), var(--accent), var(--soft-blue));
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
   background-attachment: fixed;
-  background-size: 100% 100%;
   color: var(--text);
   transition: background-color 0.5s ease, color 0.5s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
-  /* ðŸ‘‹ Custom Machii Cursor - NUCLEAR FIX (Base64 + Universal Important) */
-  cursor: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cGF0aCBkPSJNMTYgMjZDMjEuNSAyNiAyNiAyMS41IDI2IDE2QzI2IDEwLjUgMjEuNSA2IDE2IDZDMTAuNSA2IDYgMTAuNSA2IDE2QzYgMjEuNSAxMC41IDI2IDE2IDI2WiIgZmlsbD0iI0ZGQjdDNSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iMyIgZmlsbD0iI0ZGQjdDNSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjciIHI9IjMiIGZpbGw9IiNGRkI3QzUiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgPGNpcmNsZSBjeD0iMjIiIGN5PSIxMCIgcj0iMyIgZmlsbD0iI0ZGQjdDNSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KPC9zdmc+") 0 0, auto !important;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* Force cursor on everything else through selectors */
@@ -141,19 +151,35 @@ html, body {
 /* Ensure interactive elements also use the custom cursor or a pointer version if available */
 /* Interactive defaults override already handled above by universal selector */
 
-/* â”€â”€â”€ Card â”€â”€â”€ */
+/* ── Card Redesign ── */
 .card {
   background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 1.375rem;
-  box-shadow: 0 2px 16px var(--shadow), 0 1px 4px rgba(0,0,0,0.04);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
-  animation: cardEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1.5px solid var(--border);
+  border-radius: var(--premium-radius);
+  box-shadow: 0 10px 30px var(--shadow), 0 2px 5px rgba(0,0,0,0.02);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: cardEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .card:hover {
-  box-shadow: 0 8px 32px var(--shadow-md), 0 2px 8px rgba(0,0,0,0.06);
-  transform: translateY(-3px);
+  box-shadow: 0 20px 50px var(--shadow-md);
+  transform: translateY(-8px) scale(1.02);
+  border-color: var(--accent-2);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.section-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
 }
 
 /* â”€â”€â”€ EXP Bar â”€â”€â”€ */

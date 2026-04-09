@@ -129,7 +129,7 @@ const ExpenseSection = memo(function ExpenseSection({ expenses, filter, onAdd, o
       </div>
 
       {/* Add form */}
-      <form onSubmit={handleAdd} className="space-y-2 mb-4">
+      <form onSubmit={handleAdd} className="space-y-3 mb-6">
         <div className="suggestions-container" ref={suggestionsRef}>
           <input
             type="text"
@@ -138,24 +138,25 @@ const ExpenseSection = memo(function ExpenseSection({ expenses, filter, onAdd, o
             onFocus={() => setShowSuggestions(true)}
             onClick={() => setShowSuggestions(true)}
             placeholder="Nama pengeluaran..."
-            className="input-field"
+            className="input-field !rounded-full !px-5 !py-3 !bg-white/50 !border-white/40 focus:!bg-white/80 transition-all font-medium"
             autoComplete="off"
+            style={{ fontFamily: "'Nunito', sans-serif" }}
           />
           
           {showSuggestions && filteredSuggestions.length > 0 && (
-            <div className="suggestions-menu">
+            <div className="suggestions-menu !bg-white/80 !backdrop-blur-md !border-white/40 !rounded-2xl !shadow-xl !mt-2">
               {filteredSuggestions.map((s, i) => (
                 <div 
                   key={i} 
-                  className="suggestion-item"
+                  className="suggestion-item hover:!bg-accent/40 !px-4 !py-2.5 transition-colors"
                   onClick={() => handleSelectSuggestion(s.name)}
                 >
                   <div className="item-content">
                     <span className="item-icon">🛍️</span>
-                    <span className="item-name">{s.name}</span>
+                    <span className="item-name font-semibold">{s.name}</span>
                   </div>
                   {s.count > 1 && (
-                    <span className="item-freq">{s.count}x</span>
+                    <span className="item-freq bg-accent/50 px-2 py-0.5 rounded-full text-[10px] font-bold">{s.count}x</span>
                   )}
                 </div>
               ))}
@@ -168,13 +169,19 @@ const ExpenseSection = memo(function ExpenseSection({ expenses, filter, onAdd, o
             value={amount}
             onChange={e => setAmount(e.target.value)}
             placeholder="Nominal (Rp)"
-            className="input-field"
+            className="input-field !rounded-full !px-5 !py-3 !bg-white/50 !border-white/40 focus:!bg-white/80 transition-all font-medium"
             min="0"
             step="500"
+            style={{ fontFamily: "'Nunito', sans-serif" }}
           />
-          <button type="submit" className="btn-primary whitespace-nowrap">
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            type="submit" 
+            className="btn-primary !rounded-full !px-6 whitespace-nowrap !bg-success !text-white !font-bold shadow-sm"
+          >
             + Catat
-          </button>
+          </motion.button>
         </div>
       </form>
 
