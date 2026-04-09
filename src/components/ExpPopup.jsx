@@ -2,12 +2,12 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 // ── EXP gain motivational quotes ─────────────────────────────────────────
 const EXP_QUOTES = [
-  'Terus gasss matchaa! 🔥',
+  'Terus gasss matchaaww! 🔥',
   'Keren banget! Keep going~ ✨',
   'EXP nambah! Semangat terus! 💪',
   'Ciee yang rajin banget 😍',
   'Satu langkah lebih dekat ke level up! 🚀',
-  'Mantap jiwa matchaa! 🌟',
+  'Mantap jiwa matchaaww! 🌟',
   'Gaskeun! Kamu amazing! 🎯',
   'Produktifnya overflow hari ini~ 📈',
   'On fire! Jangan berhenti! 🔥🔥',
@@ -16,20 +16,20 @@ const EXP_QUOTES = [
 
 // ── Level-up celebration quotes ──────────────────────────────────────────
 const LEVELUP_QUOTES = [
-  'WOWWW LEVEL NAIK! Kamu memang the best, matchaa! 🏆',
+  'WOWWW LEVEL NAIK! Kamu memang the best, matchaaww! 🏆',
   'LEVEL UP! Ga nyangka bisa secepet ini! 🎉🎉',
-  'CONGRATULATIONS! Kamu terlalu keren, matchaa! 👑',
+  'CONGRATULATIONS! Kamu terlalu keren, matchaaww! 👑',
   'NAIK LEVEL! Api semangat kamu ga bisa dipadamkan! 🔥',
   'WOW LEVEL UP! Kamu ini bintang yang bersinar terang ya! ⭐',
   'AMAZING! Level baru, semangat baru, kamu makin keren! 🌈',
-  'LEVEL UP BESTIE! Aku bangga sama kamu, matchaa! 🥰',
+  'LEVEL UP BESTIE! Aku bangga sama kamu, matchaaww! 🥰',
 ];
 
 // ── EXP loss quotes ─────────────────────────────────────────────────────
 const LOSS_QUOTES = [
   'Oops... tapi gapapa, bangkit lagi! 💪',
   'Dih, minus... Yuk cari EXP lagi! 😤',
-  'Tenang matchaa, ini cuma sementara~ 🌸',
+  'Tenang matchaaww, ini cuma sementara~ 🌸',
   'EXP turun dikit, tapi kamu tetap hebat! 💕',
 ];
 

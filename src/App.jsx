@@ -25,6 +25,7 @@ import ScrapbookModal from './components/ScrapbookModal';
 import InteractiveTrails from './components/InteractiveTrails';
 import EmoteReaction from './components/EmoteReaction';
 import StickerManager from './components/StickerManager';
+import ScrollReveal from './components/ScrollReveal';
 
 // Lazy load decorative components
 import SkyEffects from './components/SkyEffects';
@@ -196,10 +197,7 @@ export default function App() {
         console.warn('[PAP History] Failed to fetch full history:', e);
       }
 
-      console.log('[App] Initial load complete. Setting ready to true.');
       setReady(true);
-
-
     })();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -403,10 +401,8 @@ export default function App() {
     return record;
   }, [apiAddPap, fetchPapHistory]);
 
-  console.log('[App] Rendering. Ready:', ready, 'Theme:', theme, 'EXP:', exp);
 
   if (!ready) {
-    console.log('[App] Rendering loading screen...');
     return (
       <div
         className="min-h-screen flex items-center justify-center p-6"
@@ -442,7 +438,6 @@ export default function App() {
     );
   }
 
-  console.log('[App] Rendering main UI...');
   return (
     <div
       className="min-h-screen"
@@ -533,83 +528,89 @@ export default function App() {
         <div className="main-grid">
 
           {/* ── Column 1 (Left): PAP + Daily Tasks ── */}
-          <div className="col-left">
-            <DailyPhotoTask
-              onExp={addExp}
-              onToast={addToast}
-              onAddPap={handleAddPap}
-              onSaveStreak={saveStreakToSheets}
-              streak={streak}
-              onShowExpPopup={showExpPopup}
-            />
-            <TaskSection
-              tasks={tasks}
-              filter={filter}
-              onAdd={handleAddTask}
-              onComplete={handleCompleteTask}
-              onDelete={handleDeleteTask}
-              onToast={addToast}
-            />
-          </div>
+          <ScrollReveal delay={0.1}>
+            <div className="col-left">
+              <DailyPhotoTask
+                onExp={addExp}
+                onToast={addToast}
+                onAddPap={handleAddPap}
+                onSaveStreak={saveStreakToSheets}
+                streak={streak}
+                onShowExpPopup={showExpPopup}
+              />
+              <TaskSection
+                tasks={tasks}
+                filter={filter}
+                onAdd={handleAddTask}
+                onComplete={handleCompleteTask}
+                onDelete={handleDeleteTask}
+                onToast={addToast}
+              />
+            </div>
+          </ScrollReveal>
 
           {/* ── Column 2 (Right): Expenses + Chart + Tomorrow's Plan ── */}
-          <div className="col-right">
-            <ExpenseSection
-              expenses={expenses}
-              filter={filter}
-              onAdd={handleAddExpense}
-              onDelete={handleDeleteExpense}
-              onToast={addToast}
-            />
-            <ExpenseChart expenses={expenses} />
-            <TomorrowTaskSection
-              tasks={tasks}
-              onAdd={handleAddTask}
-              onDelete={handleDeleteTask}
-              onToast={addToast}
-            />
+          <ScrollReveal delay={0.2}>
+            <div className="col-right">
+              <ExpenseSection
+                expenses={expenses}
+                filter={filter}
+                onAdd={handleAddExpense}
+                onDelete={handleDeleteExpense}
+                onToast={addToast}
+              />
+              <ExpenseChart expenses={expenses} />
+              <TomorrowTaskSection
+                tasks={tasks}
+                onAdd={handleAddTask}
+                onDelete={handleDeleteTask}
+                onToast={addToast}
+              />
 
-            {/* Optional Small Stats Card at the bottom of sidebar */}
-            <div className="card p-4 md:p-5">
-              <div className="section-title mb-3">
-                <span>⚡</span>
-                <span>Status</span>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <StatTile
-                  icon="📋"
-                  label="Tasks"
-                  value={tasks.filter(t => {
-                    const today = currentDate.isoDate;
-                    return t.date === today;
-                  }).length}
-                />
-                <StatTile
-                  icon="✅"
-                  label="Selesai"
-                  value={tasks.filter(t => {
-                    const today = currentDate.isoDate;
-                    return t.status === 'done' && t.date === today;
-                  }).length}
-                />
-                <StatTile
-                  icon="🔥"
-                  label="Streak"
-                  value={`${streak}d`}
-                />
+              {/* Optional Small Stats Card at the bottom of sidebar */}
+              <div className="card p-4 md:p-5">
+                <div className="section-title mb-3">
+                  <span>⚡</span>
+                  <span>Status</span>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <StatTile
+                    icon="📋"
+                    label="Tasks"
+                    value={tasks.filter(t => {
+                      const today = currentDate.isoDate;
+                      return t.date === today;
+                    }).length}
+                  />
+                  <StatTile
+                    icon="✅"
+                    label="Selesai"
+                    value={tasks.filter(t => {
+                      const today = currentDate.isoDate;
+                      return t.status === 'done' && t.date === today;
+                    }).length}
+                  />
+                  <StatTile
+                    icon="🔥"
+                    label="Streak"
+                    value={`${streak}d`}
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* ── Bottom Section: Insights (Full Width) ── */}
-          <div className="insight-container">
-            <InsightCard
-              tasks={tasks}
-              expenses={expenses}
-              filter={filter}
-              settings={settings}
-            />
-          </div>
+          <ScrollReveal delay={0.3}>
+            <div className="insight-container">
+              <InsightCard
+                tasks={tasks}
+                expenses={expenses}
+                filter={filter}
+                settings={settings}
+              />
+            </div>
+          </ScrollReveal>
 
         </div>
 
@@ -619,7 +620,7 @@ export default function App() {
             Made with <span className="heart">❤️</span> by <span className="creator-name">Hengky</span>
           </p>
           <p style={{ marginTop: '0.25rem' }}>
-            specially for <span className="for-name">matchaa</span> 🍵
+            specially for <span className="for-name">matchaaww</span> 🍵
           </p>
         </div>
       </div>

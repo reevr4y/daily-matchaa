@@ -2679,3 +2679,66 @@ html, body {
     display: none !important;
   }
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   PREMIUM MATCHAAAWW OVERHAUL
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Premium Glassmorphism */
+.glass-premium {
+  background: var(--glass);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
+.dark .glass-premium {
+  background: rgba(37, 35, 32, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Smoother Card Hover */
+.card-premium {
+  @apply transition-all duration-500 ease-out;
+}
+
+.card-premium:hover {
+  transform: translateY(-5px) scale(1.01);
+  box-shadow: 0 20px 40px var(--shadow-md);
+}
+
+/* Scroll Animation Utilities */
+.reveal-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-up.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Matchaaww Gradient Text */
+.matchaaww-text {
+  background: linear-gradient(135deg, var(--success), #C4A882);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
+}
+
+/* Sparkle Pop Animation */
+@keyframes sparklePop {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+.sparkle-pop {
+  position: absolute;
+  pointer-events: none;
+  animation: sparklePop 0.6s ease-out forwards;
+}
+

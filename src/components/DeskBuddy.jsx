@@ -3,11 +3,11 @@ import { useMousePosition } from '../hooks/useMousePosition';
 import { playMeow, playMachiiSuara } from '../utils/sounds';
 
 const MESSAGES = [
-  "Hallo Matchaaawww 😆💖",
-  "Matcha lagi ngapain nih? 👀",
-  "Semangat ya hari ini Matcha 💪✨",
+  "Hallo Matchaaww 😆💖",
+  "Matchaaww lagi ngapain nih? 👀",
+  "Semangat ya hari ini Matchaaww 💪✨",
   "Jangan lupa makan yaa 🍽️",
-  "Machii kangen Matcha 😽"
+  "Machii kangen Matchaaww 😽"
 ];
 
 const BASE = import.meta.env.BASE_URL || '/';
@@ -58,11 +58,25 @@ export default function DeskBuddy({ tasksCompletedToday = 0, darkMode = false, c
     }
   }, [tasksCompletedToday]);
 
-  // ✅ OPTIMIZED: Mouse tracking with singleton hook + RAF pause
+  const mousePosRef = useRef({ x: 0, y: 0 });
+
+  // Use singleton hook for global mouse tracking
+  useMousePosition((x, y) => {
+    mousePosRef.current = { x, y: y + window.scrollY };
+  });
+
+  // Track scroll position for mascot reaction
+  const scrollPosRef = useRef(0);
   useEffect(() => {
-    let mouseX = 0;
-    let mouseY = 0;
-    
+    const handleScroll = () => {
+      scrollPosRef.current = window.scrollY;
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // ✅ OPTIMIZED: RAF loop for smooth eye updates
+  useEffect(() => {
     // Smooth eye updates via RAF
     const updateEyes = () => {
       if (!containerRef.current || isWalkingRef.current) {
@@ -74,29 +88,29 @@ export default function DeskBuddy({ tasksCompletedToday = 0, darkMode = false, c
       const catX = rect.left + rect.width / 2;
       const catY = rect.top + rect.height / 2;
       
-      const angleX = (mouseX - catX) / 100;
-      const angleY = (mouseY - catY) / 100;
+      const { x, y } = mousePosRef.current;
+      const currentScrollY = scrollPosRef.current;
+      
+      const angleX = (x - catX) / 100;
+      const angleY = (y - (catY + currentScrollY)) / 100;
       
       const newX = Math.max(-8, Math.min(8, angleX * 5));
-      const newY = Math.max(-5, Math.min(5, angleY * 5));
+      const newY = Math.max(-5, Math.min(5, angleY * 5)); 
+      
+      // Add a slight look-up effect when scrolling down
+      const scrollLookY = Math.max(-5, Math.min(5, (currentScrollY / 500) * 2));
+      const finalY = Math.max(-8, Math.min(8, newY + scrollLookY));
       
       // ✅ Only update if significant change (reduce setState calls)
       setLookAt(prev => {
-        if (Math.abs(prev.x - newX) > 0.5 || Math.abs(prev.y - newY) > 0.5) {
-          return { x: newX, y: newY };
+        if (Math.abs(prev.x - newX) > 0.5 || Math.abs(prev.y - finalY) > 0.5) {
+          return { x: newX, y: finalY };
         }
         return prev;
       });
       
       rafRef.current = requestAnimationFrame(updateEyes);
     };
-
-    // Use singleton hook for global mouse tracking
-    useMousePosition((x, y) => {
-      if (isWalkingRef.current) return;
-      mouseX = x;
-      mouseY = y;
-    });
     
     const handleVisibility = () => {
       if (document.hidden) {

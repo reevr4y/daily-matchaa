@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react';
 
 const sweetMessages = [
-  "Hari ini pasti seru, apalagi kalau kamu senyum terus ya matchaa~ 🥰",
-  "Jangan lupa makan, minum, dan istirahat ya sayangku matchaa 💕",
-  "Kamu tuh udah cantik, rajin pula. Sempurna deh matchaaku! ✨",
-  "Setiap usaha kecil kamu itu berarti banget loh, matchaa 🌸",
-  "Semangat hari ini! Aku selalu support kamu, matchaa 💪🩷",
+  "Hari ini pasti seru, apalagi kalau kamu senyum terus ya matchaaww~ 🥰",
+  "Jangan lupa makan, minum, dan istirahat ya sayangku matchaaww 💕",
+  "Kamu tuh udah cantik, rajin pula. Sempurna deh matchaawwku! ✨",
+  "Setiap usaha kecil kamu itu berarti banget loh, matchaaww 🌸",
+  "Semangat hari ini! Aku selalu support kamu, matchaaww 💪🩷",
   "Kamu itu kayak matcha latte—manis, elegant, dan bikin nagih 🍵💚",
-  "Apapun yang kamu kerjain hari ini, pasti bisa! Percaya deh, matchaa~ 🌟",
-  "Good vibes only buat matchaa hari ini! 🦋✨",
-  "Kamu udah hebat banget, matchaa. Jangan terlalu keras sama diri sendiri ya 🤗",
-  "Selamat pagi/siang/malam matchaa! Kamu selalu bikin hari aku lebih berwarna 🌈",
-  "Fun fact: kamu itu sumber kebahagiaan terbesar aku, matchaa 🥹💗",
-  "Ciee yang lagi buka daily tracker-nya~ Rajin banget matchaaku! 📋🩷",
-  "Matchaa, kamu tahu ga? Kamu itu lebih manis dari gula 🍬💕",
-  "Hari ini mau produktif atau rebahan? Dua-duanya valid kok, matchaa! 😴✨",
-  "Kamu itu punya power yang ga kamu sadari, matchaa. Keep going! 💥🌸",
+  "Apapun yang kamu kerjain hari ini, pasti bisa! Percaya deh, matchaaww~ 🌟",
+  "Good vibes only buat matchaaww hari ini! 🦋✨",
+  "Kamu udah hebat banget, matchaaww. Jangan terlalu keras sama diri sendiri ya 🤗",
+  "Selamat pagi/siang/malam matchaaww! Kamu selalu bikin hari aku lebih berwarna 🌈",
+  "Fun fact: kamu itu sumber kebahagiaan terbesar aku, matchaaww 🥹💗",
+  "Ciee yang lagi buka daily tracker-nya~ Rajin banget matchaawwku! 📋🩷",
+  "Matchaaww, kamu tahu ga? Kamu itu lebih manis dari gula 🍬💕",
+  "Hari ini mau produktif atau rebahan? Dua-duanya valid kok, matchaaww! 😴✨",
+  "Kamu itu punya power yang ga kamu sadari, matchaaww. Keep going! 💥🌸",
 ];
 
 const greetingByTime = () => {
@@ -75,7 +75,7 @@ export default function WelcomeCard({ onDismiss }) {
           <h2 className="welcome-name">
             Dinda Sabrina Arianti
           </h2>
-          <p className="welcome-nickname">~ matchaa ~</p>
+          <p className="welcome-nickname">~ matchaaww ~</p>
 
           {/* Divider */}
           <div className="welcome-divider">

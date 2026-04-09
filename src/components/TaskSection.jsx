@@ -46,7 +46,7 @@ export default memo(function TaskSection({ tasks, filter, onAdd, onComplete, onD
     const y = rect.top / window.innerHeight;
     fireSmallConfetti(x, y);
     playChime();
-    onToast('Cie produktif 😏✨', 'success');
+    onToast('Cie produktif matchaaww 😏✨', 'success');
     onComplete(task.id);
   }, [onComplete, onToast, today]);
 
